@@ -15,9 +15,6 @@ export default defineConfig({
         '@renderer': resolve('src/renderer/src')
       }
     },
-    // Tailwind runs through the Vite plugin. An inline config stops Vite from walking up
-    // and loading the Next.js app's postcss.config.mjs at the repo root.
-    css: { postcss: { plugins: [] } },
     plugins: [react(), tailwindcss()]
   }
 })

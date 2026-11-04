@@ -1,10 +1,42 @@
-# Desktop app (Electron)
+# CLAUDE.md - Quy chuẩn phát triển dự án GameGuard Desktop
 
-GameGuard: app Windows kiểm soát giờ chơi game. Dùng electron-vite, React 19, TypeScript, Tailwind CSS 4, lucide-react và electron-store.
+## 1. Tổng quan công nghệ (Tech Stack)
 
-Đây là dự án npm độc lập với app web Cờ Tướng (Next.js) ở gốc repo: có `package.json`, `node_modules` và lockfile riêng. Mọi lệnh bên dưới chạy từ thư mục `desktop/`.
+- **Framework:** `electron-vite` (Template `react-ts`)
+- **Giao diện (Renderer):** React 18+, TypeScript, Tailwind CSS, `lucide-react` (icons)
+- **Hệ thống (Main Process):** Node.js (trong Electron), `child_process` (chạy lệnh Windows `tasklist` và `taskkill`), `electron.Tray`, `electron.Notification`
+- **Lưu trữ dữ liệu (Database):** `electron-store` (lưu file JSON cấu hình và lịch sử cục bộ tại `%APPDATA%` để tránh lỗi biên dịch C++ của `better-sqlite3` trên Windows)
 
-## Lệnh
+## 2. Các lệnh thường dùng
+
+- Cài đặt thư viện: `npm install`
+- Chạy môi trường Dev: `npm run dev`
+- Kiểm tra lỗi TypeScript: `npm run typecheck`
+- Đóng gói file .exe cho Windows: `npm run build:win`
+
+## 3. Kiến trúc và Quy tắc bảo mật (Bắt buộc tuân thủ)
+
+Dự án chia làm 3 tầng tách biệt trong thư mục `src/`:
+
+1. **`src/main/` (Main Process):**
+   - Chứa toàn bộ logic hệ thống: Quét tiến trình Windows (`processMonitor.ts`), lưu trữ dữ liệu (`store.ts`), quản lý khay hệ thống (`tray.ts`), và đếm giờ (`timerEngine.ts`).
+   - Tuyệt đối không để logic đếm giờ bên phía React (Renderer) vì khi ẩn cửa sổ xuống System Tray, React có thể bị dừng hoặc đóng.
+2. **`src/preload/` (Preload Script):**
+   - Sử dụng `contextBridge.exposeInMainWorld('api', ...)` để mở các hàm giao tiếp IPC an toàn.
+   - Bật `contextIsolation: true` và `nodeIntegration: false`.
+3. **`src/renderer/` (Renderer Process - Giao diện React):**
+   - Chỉ đảm nhận việc hiển thị trạng thái và gửi lệnh cấu hình xuống Main Process thông qua `window.api`.
+   - Giao diện thiết kế theo phong cách Dark Mode tối giản, dễ nhìn.
+
+## 4. Quy tắc viết code cho Claude
+
+- Luôn định nghĩa đầy đủ kiểu dữ liệu (TypeScript Interfaces) trong file dùng chung `src/shared/types.ts` trước khi viết logic.
+- Mọi lệnh gọi `tasklist` và `taskkill` trên Windows phải bọc trong `try/catch` để tránh làm crash ứng dụng khi gặp tiến trình yêu cầu quyền Administrator.
+- Không tự ý thêm các thư viện UI nặng nề (như MUI hay Antd), chỉ dùng Tailwind CSS thuần.
+
+## 5. Ghi chú vận hành
+
+### Lệnh
 
 | Lệnh | Tác dụng |
 | --- | --- |
@@ -17,7 +49,7 @@ GameGuard: app Windows kiểm soát giờ chơi game. Dùng electron-vite, React
 | `npm run build:unpack` | Đóng gói không cài đặt vào `dist/win-unpacked/` |
 | `npm run build:win` / `build:mac` / `build:linux` | Tạo bộ cài vào `dist/` |
 
-## Kiến trúc Main - Preload - Renderer
+### Kiến trúc Main - Preload - Renderer
 
 ```
 Renderer (React)  --window.api.*-->  Preload  --ipcRenderer.invoke-->  Main
@@ -34,7 +66,7 @@ Kiểu dùng chung cho cả ba tầng nằm ở `src/shared/types.ts`, gồm c�
 
 Output nằm ở `out/main`, `out/preload`, `out/renderer`. Alias `@renderer/*` trỏ tới `src/renderer/src/*`.
 
-### Main process
+#### Main process
 
 | File | Vai trò |
 | --- | --- |
@@ -44,7 +76,7 @@ Output nằm ở `out/main`, `out/preload`, `out/renderer`. Alias `@renderer/*` 
 
 Logic đếm giờ chỉ nằm ở main, không đặt trong React. Vòng lặp chỉ gọi `tasklist`; `getRunningProcesses()` khởi động PowerShell nên chỉ dùng khi UI cần, không gọi theo chu kỳ.
 
-### Renderer
+#### Renderer
 
 | File | Vai trò |
 | --- | --- |
@@ -57,7 +89,7 @@ Logic đếm giờ chỉ nằm ở main, không đặt trong React. Vòng lặp 
 
 `isLocked` chỉ nằm ở renderer: IPC trong main không kiểm tra khóa. `tempUnlockedUntil` không lưu xuống đĩa, tải lại trang sẽ về trạng thái khóa.
 
-### Thêm một lệnh IPC
+#### Thêm một lệnh IPC
 
 1. `src/main/ipcHandlers.ts`: đăng ký `ipcMain.handle('kenh', handler)`.
 2. `src/preload/index.ts`: thêm hàm vào object `api`, gọi `ipcRenderer.invoke('kenh', ...)`.
@@ -66,21 +98,21 @@ Logic đếm giờ chỉ nằm ở main, không đặt trong React. Vòng lặp 
 
 Template còn phơi `window.electron` (gồm `ipcRenderer` thô) cho renderer. Code mới dùng `window.api` với hàm cụ thể, không để renderer tự gửi kênh tùy ý.
 
-## Quy ước
+### Quy ước
 
-### Lưu trữ
+#### Lưu trữ
 
-- Dữ liệu dùng `electron-store`, file `config.json` trong `app.getPath('userData')`. Thư mục này lấy theo tên app, nên đổi `name` trong `package.json` sẽ làm mất dữ liệu cũ.
+- Dữ liệu dùng `electron-store`, file `config.json` trong `app.getPath('userData')` (`%APPDATA%\gameguard`). Thư mục này lấy theo tên app, nên đổi `name` trong `package.json` sẽ làm mất dữ liệu cũ.
 - `electron-store` là ESM-only còn main bundle là CJS. Nó phải nằm trong `externalizeDeps.exclude` ở `electron.vite.config.ts` để được bundle; bỏ đi thì `npm run typecheck` vẫn đạt nhưng có thể lỗi lúc chạy.
 - Ngày `YYYY-MM-DD` tính theo giờ máy bằng `toDateKey()`, không dùng `toISOString()`.
 
-### Gọi lệnh Windows
+#### Gọi lệnh Windows
 
 - Dùng `execFile` với mảng tham số, không ghép chuỗi qua shell, và bọc `try/catch`.
 - `exeName` phải qua `isValidExeName()`: `taskkill /F /IM "*"` sẽ tắt mọi tiến trình.
 - `taskkill /IM` tắt mọi tiến trình cùng tên. Khi test, dùng bản copy của một file exe với tên riêng, không dùng app có thể đang mở dữ liệu chưa lưu.
 
-### better-sqlite3
+#### better-sqlite3
 
 Đã cài nhưng chưa dùng, lưu trữ hiện tại là `electron-store`.
 
@@ -91,22 +123,16 @@ Template còn phơi `window.electron` (gồm `ipcRenderer` thô) cho renderer. C
 - npm báo chặn install script `node-gyp rebuild` của gói này: bỏ qua, không cần `npm install-scripts approve`. `binding.gyp` không compile gì khi đã có prebuild cho máy đang chạy.
 - `postinstall` vẫn gọi `electron-builder install-app-deps`. Bước này chỉ để lại thư mục `build/` không chứa `.node`, nên không ảnh hưởng tới binary đang dùng.
 
-### Tailwind CSS
+#### Tailwind CSS
 
 - Dùng bản 4 qua plugin `@tailwindcss/vite`, không có `tailwind.config`. File vào là `src/renderer/src/assets/main.css`.
-- `css.postcss` trong `electron.vite.config.ts` phải giữ nguyên. Thiếu nó, Vite sẽ nạp `postcss.config.mjs` của app Next ở gốc repo và build lỗi.
 - CSS tự viết nên đặt trong `@layer`. Style ngoài layer luôn thắng utility của Tailwind, ví dụ `* { margin: 0 }` sẽ vô hiệu hóa `m-4`.
 
-### Tài nguyên ngoài
+#### Tài nguyên ngoài
 
 CSP nằm trong `src/renderer/index.html` và chỉ cho phép `'self'`. Muốn nạp script, ảnh hay kết nối ra ngoài thì phải sửa CSP.
 
-## Liên quan tới gốc repo
+### Giá trị mẫu cần thay trước khi phát hành
 
-`tsconfig.json` và `eslint.config.mjs` ở gốc đã loại trừ `desktop/` để `next build` không typecheck code Electron. Giữ nguyên các mục loại trừ này.
-
-## Giá trị mẫu cần thay trước khi phát hành
-
-- `electron-builder.yml`: `appId`, `productName`, `publish.url`
-- `package.json`: `name`, `description`, `author`, `homepage`
-- `src/main/index.ts`: `setAppUserModelId('com.electron')`
+- `electron-builder.yml`: `publish.url`
+- `build/icon.*`, `resources/icon.png`: vẫn là icon mặc định của template
