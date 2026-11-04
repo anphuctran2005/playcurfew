@@ -4,7 +4,10 @@ import react from '@vitejs/plugin-react'
 import tailwindcss from '@tailwindcss/vite'
 
 export default defineConfig({
-  main: {},
+  main: {
+    // electron-store is ESM-only and the main bundle is CJS, so it must be bundled, not required.
+    build: { externalizeDeps: { exclude: ['electron-store'] } }
+  },
   preload: {},
   renderer: {
     resolve: {

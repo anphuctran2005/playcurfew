@@ -1,6 +1,6 @@
 # Desktop app (Electron)
 
-App desktop dùng electron-vite, React 19, TypeScript, Tailwind CSS 4, lucide-react và better-sqlite3.
+GameGuard: app Windows kiểm soát giờ chơi game. Dùng electron-vite, React 19, TypeScript, Tailwind CSS 4, lucide-react và electron-store.
 
 Đây là dự án npm độc lập với app web Cờ Tướng (Next.js) ở gốc repo: có `package.json`, `node_modules` và lockfile riêng. Mọi lệnh bên dưới chạy từ thư mục `desktop/`.
 
@@ -30,20 +30,46 @@ Renderer (React)  --window.api.*-->  Preload  --ipcRenderer.invoke-->  Main
 | Preload | `src/preload/` | Context cô lập, nạp trước trang | Chỉ phơi bày API được chọn sang renderer qua `contextBridge`. |
 | Renderer | `src/renderer/` | Chromium | Giao diện React. Không có `require` hay module Node (đã kiểm chứng). |
 
+Kiểu dùng chung cho cả ba tầng nằm ở `src/shared/types.ts`, gồm cả `WindowApi` là hợp đồng của `window.api`.
+
 Output nằm ở `out/main`, `out/preload`, `out/renderer`. Alias `@renderer/*` trỏ tới `src/renderer/src/*`.
+
+### Main process
+
+| File | Vai trò |
+| --- | --- |
+| `store.ts` | Đọc ghi dữ liệu qua `electron-store`, dữ liệu mặc định, reset usage theo ngày |
+| `processMonitor.ts` | Quét tiến trình, tắt game, vòng lặp 5 giây, thông báo, gửi `on-tick-update` |
+| `ipcHandlers.ts` | Đăng ký toàn bộ kênh `ipcMain.handle` |
+
+Logic đếm giờ chỉ nằm ở main, không đặt trong React. Vòng lặp chỉ gọi `tasklist`; `getRunningProcesses()` khởi động PowerShell nên chỉ dùng khi UI cần, không gọi theo chu kỳ.
 
 ### Thêm một lệnh IPC
 
-1. `src/main/`: đăng ký `ipcMain.handle('kenh', handler)`.
+1. `src/main/ipcHandlers.ts`: đăng ký `ipcMain.handle('kenh', handler)`.
 2. `src/preload/index.ts`: thêm hàm vào object `api`, gọi `ipcRenderer.invoke('kenh', ...)`.
-3. `src/preload/index.d.ts`: khai báo type cho `api` (hiện đang là `unknown`).
+3. `src/shared/types.ts`: khai báo hàm trong `WindowApi`.
 4. Renderer: gọi `window.api.tenHam()`.
 
 Template còn phơi `window.electron` (gồm `ipcRenderer` thô) cho renderer. Code mới dùng `window.api` với hàm cụ thể, không để renderer tự gửi kênh tùy ý.
 
 ## Quy ước
 
+### Lưu trữ
+
+- Dữ liệu dùng `electron-store`, file `config.json` trong `app.getPath('userData')`. Thư mục này lấy theo tên app, nên đổi `name` trong `package.json` sẽ làm mất dữ liệu cũ.
+- `electron-store` là ESM-only còn main bundle là CJS. Nó phải nằm trong `externalizeDeps.exclude` ở `electron.vite.config.ts` để được bundle; bỏ đi thì `npm run typecheck` vẫn đạt nhưng có thể lỗi lúc chạy.
+- Ngày `YYYY-MM-DD` tính theo giờ máy bằng `toDateKey()`, không dùng `toISOString()`.
+
+### Gọi lệnh Windows
+
+- Dùng `execFile` với mảng tham số, không ghép chuỗi qua shell, và bọc `try/catch`.
+- `exeName` phải qua `isValidExeName()`: `taskkill /F /IM "*"` sẽ tắt mọi tiến trình.
+- `taskkill /IM` tắt mọi tiến trình cùng tên. Khi test, dùng bản copy của một file exe với tên riêng, không dùng app có thể đang mở dữ liệu chưa lưu.
+
 ### better-sqlite3
+
+Đã cài nhưng chưa dùng, lưu trữ hiện tại là `electron-store`.
 
 - Chỉ import trong main process. Renderer truy cập dữ liệu qua IPC.
 - API đồng bộ, nên truy vấn chậm sẽ chặn main process.
