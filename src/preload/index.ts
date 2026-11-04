@@ -1,22 +1,35 @@
-import { contextBridge } from 'electron'
+import { contextBridge, ipcRenderer, type IpcRendererEvent } from 'electron'
 import { electronAPI } from '@electron-toolkit/preload'
+import type { DashboardState, WindowApi } from '../shared/types'
 
-// Custom APIs for renderer
-const api = {}
+const api: WindowApi = {
+  getDashboardState: () => ipcRenderer.invoke('get-dashboard-state'),
+  getTodayUsage: () => ipcRenderer.invoke('get-today-usage'),
+  getRunningProcesses: () => ipcRenderer.invoke('get-running-processes'),
 
-// Use `contextBridge` APIs to expose Electron APIs to
-// renderer only if context isolation is enabled, otherwise
-// just add to the DOM global.
-if (process.contextIsolated) {
-  try {
-    contextBridge.exposeInMainWorld('electron', electronAPI)
-    contextBridge.exposeInMainWorld('api', api)
-  } catch (error) {
-    console.error(error)
+  getConfig: () => ipcRenderer.invoke('get-config'),
+  updateConfig: (patch) => ipcRenderer.invoke('update-config', patch),
+
+  getGames: () => ipcRenderer.invoke('get-games'),
+  addGame: (game) => ipcRenderer.invoke('add-game', game),
+  updateGame: (id, patch) => ipcRenderer.invoke('update-game', id, patch),
+  removeGame: (id) => ipcRenderer.invoke('remove-game', id),
+
+  getFocusSchedules: () => ipcRenderer.invoke('get-focus-schedules'),
+  addFocusSchedule: (schedule) => ipcRenderer.invoke('add-focus-schedule', schedule),
+  updateFocusSchedule: (id, patch) => ipcRenderer.invoke('update-focus-schedule', id, patch),
+  removeFocusSchedule: (id) => ipcRenderer.invoke('remove-focus-schedule', id),
+
+  onTickUpdate: (callback) => {
+    const listener = (_: IpcRendererEvent, state: DashboardState): void => callback(state)
+    ipcRenderer.on('on-tick-update', listener)
+    return () => ipcRenderer.removeListener('on-tick-update', listener)
   }
-} else {
-  // @ts-ignore (define in dts)
-  window.electron = electronAPI
-  // @ts-ignore (define in dts)
-  window.api = api
+}
+
+try {
+  contextBridge.exposeInMainWorld('electron', electronAPI)
+  contextBridge.exposeInMainWorld('api', api)
+} catch (error) {
+  console.error(error)
 }
