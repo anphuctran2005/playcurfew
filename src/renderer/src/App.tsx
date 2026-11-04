@@ -1,58 +1,94 @@
 import { useEffect, useState } from 'react'
-import { Plus } from 'lucide-react'
-import type { DashboardState, GameItem } from '../../shared/types'
+import { LoaderCircle } from 'lucide-react'
+import type { AppConfig, DashboardState } from '../../shared/types'
+import BlacklistTab from './components/BlacklistTab'
+import DashboardTab from './components/DashboardTab'
+import EmergencyUnlockModal from './components/EmergencyUnlockModal'
+import ScheduleTab from './components/ScheduleTab'
+import Sidebar, { type TabId } from './components/Sidebar'
 
-// Màn hình Debug tạm thời cho Giai đoạn 2, sẽ thay bằng UI chính thức.
+const TEMP_UNLOCK_MS = 5 * 60 * 1000
+
 function App(): React.JSX.Element {
   const [dashboard, setDashboard] = useState<DashboardState | null>(null)
-  const [games, setGames] = useState<GameItem[]>([])
-  const [error, setError] = useState('')
+  const [config, setConfig] = useState<AppConfig | null>(null)
+  const [activeTab, setActiveTab] = useState<TabId>('dashboard')
+  const [isUnlockModalOpen, setIsUnlockModalOpen] = useState(false)
+  const [tempUnlockedUntil, setTempUnlockedUntil] = useState<number | null>(null)
+  const [now, setNow] = useState(() => Date.now())
+
+  const refreshDashboard = (): void => {
+    window.api.getDashboardState().then(setDashboard)
+  }
 
   useEffect(() => {
-    window.api.getDashboardState().then(setDashboard)
-    window.api.getGames().then(setGames)
+    refreshDashboard()
+    window.api.getConfig().then(setConfig)
     return window.api.onTickUpdate(setDashboard)
   }, [])
 
-  const addNotepad = async (): Promise<void> => {
-    try {
-      await window.api.addGame({ name: 'Notepad (test)', exeName: 'notepad.exe', isActive: true })
-      setGames(await window.api.getGames())
-      setError('')
-    } catch (e) {
-      setError(String(e))
-    }
+  useEffect(() => {
+    if (tempUnlockedUntil === null) return
+
+    const timer = setInterval(() => {
+      const current = Date.now()
+      setNow(current)
+      if (current >= tempUnlockedUntil) setTempUnlockedUntil(null)
+    }, 1000)
+    return () => clearInterval(timer)
+  }, [tempUnlockedUntil])
+
+  if (!dashboard || !config) {
+    return (
+      <div className="flex h-full items-center justify-center text-slate-400">
+        <LoaderCircle className="size-6 animate-spin" />
+      </div>
+    )
+  }
+
+  const tempUnlockMsLeft = tempUnlockedUntil === null ? 0 : Math.max(tempUnlockedUntil - now, 0)
+  const isRestricted =
+    dashboard.isFocusActive || dashboard.remainingSeconds <= 0 || dashboard.runningGames.length > 0
+  const isLocked = isRestricted && tempUnlockMsLeft === 0
+
+  const startTempUnlock = (): void => {
+    const current = Date.now()
+    setNow(current)
+    setTempUnlockedUntil(current + TEMP_UNLOCK_MS)
+    setIsUnlockModalOpen(false)
   }
 
   return (
-    <main className="flex min-h-screen flex-col gap-4 bg-slate-950 p-6 text-slate-100">
-      <header className="flex items-center justify-between">
-        <h1 className="text-lg font-semibold">GameGuard Debug</h1>
-        <button
-          type="button"
-          onClick={addNotepad}
-          className="inline-flex items-center gap-2 rounded-lg bg-sky-600 px-3 py-2 text-sm font-medium hover:bg-sky-500"
-        >
-          <Plus className="size-4" />
-          Chặn notepad.exe
-        </button>
-      </header>
-      {error && <p className="text-sm text-red-400">{error}</p>}
+    <div className="flex h-full">
+      <Sidebar
+        activeTab={activeTab}
+        onTabChange={setActiveTab}
+        isLocked={isLocked}
+        tempUnlockMsLeft={tempUnlockMsLeft}
+        onEmergencyUnlock={() => setIsUnlockModalOpen(true)}
+      />
 
-      <section>
-        <h2 className="mb-1 text-sm text-slate-400">DashboardState (cập nhật mỗi 5 giây)</h2>
-        <pre className="overflow-auto rounded-lg bg-slate-900 p-3 text-xs">
-          {JSON.stringify(dashboard, null, 2)}
-        </pre>
-      </section>
+      <main className="min-w-0 flex-1 overflow-y-auto p-6">
+        {activeTab === 'dashboard' && <DashboardTab dashboard={dashboard} />}
+        {activeTab === 'blacklist' && <BlacklistTab isLocked={isLocked} />}
+        {activeTab === 'schedule' && (
+          <ScheduleTab
+            config={config}
+            isLocked={isLocked}
+            onConfigChange={setConfig}
+            onChanged={refreshDashboard}
+          />
+        )}
+      </main>
 
-      <section>
-        <h2 className="mb-1 text-sm text-slate-400">Danh sách game ({games.length})</h2>
-        <pre className="overflow-auto rounded-lg bg-slate-900 p-3 text-xs">
-          {JSON.stringify(games, null, 2)}
-        </pre>
-      </section>
-    </main>
+      {isUnlockModalOpen && (
+        <EmergencyUnlockModal
+          phrase={config.commitmentPhrase}
+          onConfirm={startTempUnlock}
+          onClose={() => setIsUnlockModalOpen(false)}
+        />
+      )}
+    </div>
   )
 }
 

@@ -33,6 +33,10 @@ export function toDateKey(date: Date = new Date()): string {
   return `${date.getFullYear()}-${month}-${day}`
 }
 
+const LEGACY_COMMITMENT_PHRASE = 'Tôi hiểu rằng tôi đang phá vỡ cam kết học tập của chính mình'
+const DEFAULT_COMMITMENT_PHRASE =
+  'Tôi xác nhận đang tự phá vỡ kỷ luật của bản thân và việc mở khóa lúc này sẽ làm ảnh hưởng trực tiếp đến mục tiêu học tập cũng như công việc của tôi.'
+
 function emptyUsage(): DailyUsage {
   return { date: toDateKey(), usedSeconds: 0, sessions: [] }
 }
@@ -43,7 +47,7 @@ const store = new Store<StoreSchema>({
       weekdayLimitMinutes: 60,
       weekendLimitMinutes: 120,
       warningMinutesLeft: [5, 1],
-      commitmentPhrase: 'Tôi hiểu rằng tôi đang phá vỡ cam kết học tập của chính mình',
+      commitmentPhrase: DEFAULT_COMMITMENT_PHRASE,
       launchAtStartup: false
     },
     games: [
@@ -73,6 +77,11 @@ const store = new Store<StoreSchema>({
     dailyUsage: emptyUsage()
   }
 })
+
+// electron-store chỉ điền key còn thiếu, nên config đã lưu sẽ giữ câu mặc định cũ nếu không đổi ở đây.
+if (store.get('config').commitmentPhrase === LEGACY_COMMITMENT_PHRASE) {
+  store.set('config.commitmentPhrase', DEFAULT_COMMITMENT_PHRASE)
+}
 
 export function getConfig(): AppConfig {
   return store.get('config')

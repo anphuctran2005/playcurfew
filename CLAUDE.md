@@ -44,6 +44,19 @@ Output nằm ở `out/main`, `out/preload`, `out/renderer`. Alias `@renderer/*` 
 
 Logic đếm giờ chỉ nằm ở main, không đặt trong React. Vòng lặp chỉ gọi `tasklist`; `getRunningProcesses()` khởi động PowerShell nên chỉ dùng khi UI cần, không gọi theo chu kỳ.
 
+### Renderer
+
+| File | Vai trò |
+| --- | --- |
+| `App.tsx` | State tổng, tính `isLocked`, `tempUnlockedUntil` |
+| `components/Sidebar.tsx` | Điều hướng tab, trạng thái khóa, đếm ngược mở khóa tạm thời |
+| `components/DashboardTab.tsx` | Vòng tiến độ, badge trạng thái, lịch sử phiên chơi |
+| `components/BlacklistTab.tsx` | Quản lý game, quét cửa sổ đang mở |
+| `components/ScheduleTab.tsx` | Giới hạn phút, khung giờ Focus |
+| `components/EmergencyUnlockModal.tsx` | Gõ lại câu cam kết để mở khóa 5 phút |
+
+`isLocked` chỉ nằm ở renderer: IPC trong main không kiểm tra khóa. `tempUnlockedUntil` không lưu xuống đĩa, tải lại trang sẽ về trạng thái khóa.
+
 ### Thêm một lệnh IPC
 
 1. `src/main/ipcHandlers.ts`: đăng ký `ipcMain.handle('kenh', handler)`.
