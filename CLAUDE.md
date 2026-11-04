@@ -1,4 +1,4 @@
-# CLAUDE.md - Quy chuẩn phát triển dự án GameGuard Desktop
+# CLAUDE.md - Quy chuẩn phát triển dự án PlayCurfew Desktop
 
 ## 1. Tổng quan công nghệ (Tech Stack)
 
@@ -102,7 +102,7 @@ Template còn phơi `window.electron` (gồm `ipcRenderer` thô) cho renderer. C
 
 #### Lưu trữ
 
-- Dữ liệu dùng `electron-store`, file `config.json` trong `app.getPath('userData')` (`%APPDATA%\gameguard`). Thư mục này lấy theo tên app, nên đổi `name` trong `package.json` sẽ làm mất dữ liệu cũ.
+- Dữ liệu dùng `electron-store`, file `config.json` trong `app.getPath('userData')` (`%APPDATA%\playcurfew`). Thư mục này lấy theo tên app, nên đổi `name` trong `package.json` sẽ làm mất dữ liệu cũ.
 - `electron-store` là ESM-only còn main bundle là CJS. Nó phải nằm trong `externalizeDeps.exclude` ở `electron.vite.config.ts` để được bundle; bỏ đi thì `npm run typecheck` vẫn đạt nhưng có thể lỗi lúc chạy.
 - Ngày `YYYY-MM-DD` tính theo giờ máy bằng `toDateKey()`, không dùng `toISOString()`.
 

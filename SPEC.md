@@ -1,4 +1,4 @@
-# SPEC.md - Đặc tả kỹ thuật ứng dụng kiểm soát giờ chơi game (GameGuard)
+# SPEC.md - Đặc tả kỹ thuật ứng dụng kiểm soát giờ chơi game (PlayCurfew)
 
 ## 1. Mục tiêu hệ thống
 

@@ -28,7 +28,7 @@ function Sidebar({
     <aside className="flex w-60 shrink-0 flex-col gap-6 border-r border-slate-700 bg-slate-800 p-4">
       <h1 className="flex items-center gap-2 px-2 text-lg font-semibold">
         <ShieldCheck className="size-6 text-emerald-400" />
-        GameGuard
+        PlayCurfew
       </h1>
 
       <nav className="flex flex-1 flex-col gap-1">

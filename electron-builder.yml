@@ -1,5 +1,5 @@
-appId: com.gameguard.app
-productName: GameGuard
+appId: com.playcurfew.app
+productName: PlayCurfew
 directories:
   buildResources: build
 files:
@@ -14,9 +14,9 @@ files:
 asarUnpack:
   - resources/**
 win:
-  executableName: GameGuard
+  executableName: PlayCurfew
 nsis:
-  artifactName: GameGuard-Setup.${ext}
+  artifactName: PlayCurfew-Setup.${ext}
   shortcutName: ${productName}
   uninstallDisplayName: ${productName}
   createDesktopShortcut: always
