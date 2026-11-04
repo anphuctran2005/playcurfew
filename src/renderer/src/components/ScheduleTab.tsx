@@ -4,6 +4,7 @@ import type { AppConfig, FocusSchedule } from '../../../shared/types'
 import { errorMessage } from '../lib/format'
 import LockNotice from './LockNotice'
 import Toggle from './Toggle'
+import { Card, PageHeader } from './ui'
 
 const MAX_LIMIT_MINUTES = 1440
 const SLIDER_MAX_MINUTES = 720
@@ -20,9 +21,6 @@ const WEEK_DAYS = [
   { value: 0, label: 'CN' }
 ]
 
-const INPUT_CLASS =
-  'rounded-lg border border-slate-600 bg-slate-900 px-3 py-2 text-sm placeholder:text-slate-500 focus:border-sky-500 focus:outline-none'
-
 interface QuotaFieldProps {
   label: string
   value: number
@@ -36,31 +34,29 @@ function QuotaField({ label, value, onChange }: QuotaFieldProps): React.JSX.Elem
 
   return (
     <div className="flex flex-col gap-2">
-      <div className="flex items-center justify-between gap-4">
-        <span className="text-sm">{label}</span>
-        <span className="flex items-center gap-2 text-sm text-slate-400">
-          <input
-            type="number"
-            min={0}
-            max={MAX_LIMIT_MINUTES}
-            value={value}
-            onChange={(e) => setClamped(e.target.value)}
-            aria-label={`${label} (phút)`}
-            className={`${INPUT_CLASS} w-24 text-right`}
-          />
-          phút
-        </span>
+      <span className="text-sm">{label}</span>
+      <div className="flex items-center gap-3">
+        <input
+          type="range"
+          min={0}
+          max={SLIDER_MAX_MINUTES}
+          step={SLIDER_STEP_MINUTES}
+          value={value}
+          onChange={(e) => setClamped(e.target.value)}
+          aria-label={label}
+          className="min-w-0 flex-1 accent-emerald-500"
+        />
+        <input
+          type="number"
+          min={0}
+          max={MAX_LIMIT_MINUTES}
+          value={value}
+          onChange={(e) => setClamped(e.target.value)}
+          aria-label={`${label} (phút)`}
+          className="field w-20 text-right"
+        />
+        <span className="text-sm text-slate-400">phút</span>
       </div>
-      <input
-        type="range"
-        min={0}
-        max={SLIDER_MAX_MINUTES}
-        step={SLIDER_STEP_MINUTES}
-        value={value}
-        onChange={(e) => setClamped(e.target.value)}
-        aria-label={label}
-        className="w-full accent-emerald-500"
-      />
     </div>
   )
 }
@@ -83,10 +79,10 @@ function DayPicker({ days, isDayDisabled, onToggle }: DayPickerProps): React.JSX
             aria-pressed={isSelected}
             disabled={isDayDisabled?.(value)}
             onClick={() => onToggle(value)}
-            className={`size-8 rounded-full text-xs font-medium transition-colors disabled:opacity-50 ${
+            className={`size-8 rounded-full text-xs font-medium transition-colors disabled:cursor-not-allowed disabled:opacity-50 ${
               isSelected
                 ? 'bg-sky-600 text-white'
-                : 'bg-slate-700 text-slate-300 hover:bg-slate-600'
+                : 'bg-slate-700 text-slate-300 not-disabled:hover:bg-slate-600'
             }`}
           >
             {label}
@@ -95,6 +91,11 @@ function DayPicker({ days, isDayDisabled, onToggle }: DayPickerProps): React.JSX
       })}
     </div>
   )
+}
+
+// Ô nhập chữ thay cho type="time": ô gốc hiện AM/PM theo cài đặt Windows, không khớp với 24 giờ.
+function isValidTime(time: string): boolean {
+  return /^([01]\d|2[0-3]):[0-5]\d$/.test(time)
 }
 
 function toggleDay(days: number[], day: number): number[] {
@@ -178,13 +179,16 @@ function ScheduleTab({
   const canAdd =
     label.trim() !== '' &&
     days.length > 0 &&
-    startTime !== '' &&
-    endTime !== '' &&
+    isValidTime(startTime) &&
+    isValidTime(endTime) &&
     startTime !== endTime
 
   return (
-    <div className="mx-auto flex max-w-3xl flex-col gap-4">
-      <h2 className="text-xl font-semibold">Giới hạn & Khung giờ Focus</h2>
+    <div className="mx-auto flex max-w-4xl flex-col gap-4">
+      <PageHeader
+        title="Giới hạn & Khung giờ Focus"
+        subtitle="Đặt số phút chơi mỗi ngày và các khung giờ không được mở game."
+      />
 
       {isLocked && (
         <LockNotice>
@@ -193,41 +197,42 @@ function ScheduleTab({
       )}
       {error && <p className="text-sm text-red-400">{error}</p>}
 
-      <section className="flex flex-col gap-4 rounded-xl border border-slate-700 bg-slate-800 p-4">
-        <h3 className="text-sm font-semibold">Giới hạn mỗi ngày</h3>
-        <QuotaField
-          label="Giới hạn Ngày thường (Thứ 2 - Thứ 6)"
-          value={weekdayLimit}
-          onChange={setWeekdayLimit}
-        />
-        <QuotaField
-          label="Giới hạn Cuối tuần (Thứ 7 - CN)"
-          value={weekendLimit}
-          onChange={setWeekendLimit}
-        />
-        <div className="flex items-center gap-3">
-          <button
-            type="button"
-            disabled={!isDirty || isIncreaseBlocked}
-            onClick={saveLimits}
-            className="inline-flex items-center gap-2 rounded-lg bg-sky-600 px-3 py-2 text-sm font-medium text-white hover:bg-sky-500 disabled:opacity-50"
-          >
-            {isIncreaseBlocked ? <Lock className="size-4" /> : <Save className="size-4" />}
-            Lưu cấu hình
-          </button>
-          {isIncreaseBlocked && (
-            <span className="text-sm text-red-300">
-              Đang khóa: chỉ được giảm giới hạn, không được tăng.
-            </span>
-          )}
+      <Card
+        title="Giới hạn mỗi ngày"
+        action={
+          <div className="flex items-center gap-3">
+            {isIncreaseBlocked && (
+              <span className="text-xs text-red-300">
+                Đang khóa: chỉ được giảm giới hạn, không được tăng.
+              </span>
+            )}
+            <button
+              type="button"
+              disabled={!isDirty || isIncreaseBlocked}
+              onClick={saveLimits}
+              className="btn btn-primary"
+            >
+              {isIncreaseBlocked ? <Lock className="size-4" /> : <Save className="size-4" />}
+              Lưu cấu hình
+            </button>
+          </div>
+        }
+      >
+        <div className="grid grid-cols-2 gap-6 p-4">
+          <QuotaField
+            label="Giới hạn Ngày thường (Thứ 2 - Thứ 6)"
+            value={weekdayLimit}
+            onChange={setWeekdayLimit}
+          />
+          <QuotaField
+            label="Giới hạn Cuối tuần (Thứ 7 - CN)"
+            value={weekendLimit}
+            onChange={setWeekendLimit}
+          />
         </div>
-      </section>
+      </Card>
 
-      <section className="rounded-xl border border-slate-700 bg-slate-800">
-        <h3 className="border-b border-slate-700 px-4 py-3 text-sm font-semibold">
-          Khung giờ Focus ({schedules.length})
-        </h3>
-
+      <Card title={`Khung giờ Focus (${schedules.length})`}>
         {schedules.length === 0 ? (
           <p className="px-4 py-6 text-center text-sm text-slate-400">Chưa có khung giờ nào.</p>
         ) : (
@@ -269,7 +274,7 @@ function ScheduleTab({
                   aria-label={`Xóa ${schedule.label}`}
                   title={isLocked ? 'Đang khóa: dùng "Mở khóa khẩn cấp" để xóa' : undefined}
                   onClick={() => run(() => window.api.removeFocusSchedule(schedule.id))}
-                  className="rounded-lg p-2 text-slate-400 hover:bg-red-500/15 hover:text-red-400 disabled:opacity-50 disabled:hover:bg-transparent disabled:hover:text-slate-400"
+                  className="btn-delete"
                 >
                   {isLocked ? <Lock className="size-4" /> : <Trash2 className="size-4" />}
                 </button>
@@ -285,37 +290,37 @@ function ScheduleTab({
               onChange={(e) => setLabel(e.target.value)}
               placeholder="Nhãn, ví dụ: Giờ học buổi tối"
               aria-label="Nhãn khung giờ"
-              className={`${INPUT_CLASS} min-w-0 flex-1`}
+              className="field min-w-0 flex-1"
             />
             <input
-              type="time"
               value={startTime}
               onChange={(e) => setStartTime(e.target.value)}
+              placeholder="19:30"
+              maxLength={5}
               aria-label="Giờ bắt đầu"
-              className={INPUT_CLASS}
+              aria-invalid={!isValidTime(startTime)}
+              className="field w-20 text-center tabular-nums aria-invalid:border-red-500"
             />
             <span className="text-slate-400">-</span>
             <input
-              type="time"
               value={endTime}
               onChange={(e) => setEndTime(e.target.value)}
+              placeholder="22:00"
+              maxLength={5}
               aria-label="Giờ kết thúc"
-              className={INPUT_CLASS}
+              aria-invalid={!isValidTime(endTime)}
+              className="field w-20 text-center tabular-nums aria-invalid:border-red-500"
             />
           </div>
           <div className="flex items-center justify-between gap-4">
             <DayPicker days={days} onToggle={(day) => setDays(toggleDay(days, day))} />
-            <button
-              type="submit"
-              disabled={!canAdd}
-              className="inline-flex items-center gap-2 rounded-lg bg-sky-600 px-3 py-2 text-sm font-medium text-white hover:bg-sky-500 disabled:opacity-50"
-            >
+            <button type="submit" disabled={!canAdd} className="btn btn-primary">
               <Plus className="size-4" />
               Thêm khung giờ
             </button>
           </div>
         </form>
-      </section>
+      </Card>
     </div>
   )
 }

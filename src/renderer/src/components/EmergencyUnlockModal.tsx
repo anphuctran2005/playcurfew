@@ -38,6 +38,7 @@ function EmergencyUnlockModal({
   const typedChars = [...input.normalize('NFC')]
   const extraChars = typedChars.slice(expectedChars.length).join('')
   const isMatch = typedChars.join('') === expectedChars.join('')
+  const correctCount = expectedChars.filter((char, index) => char === typedChars[index]).length
 
   return (
     <dialog
@@ -77,31 +78,27 @@ function EmergencyUnlockModal({
         onDrop={blockInsert}
         onDragOver={blockInsert}
         onKeyDown={blockPasteShortcut}
-        rows={4}
+        rows={3}
         autoFocus
         spellCheck={false}
         autoComplete="off"
         aria-label="Gõ lại câu cam kết"
-        className="mt-4 w-full resize-none rounded-lg border border-slate-600 bg-slate-900 p-3 text-sm focus:border-sky-500 focus:outline-none"
+        className="field mt-4 w-full resize-none"
       />
 
-      <div className="mt-4 flex justify-end gap-2">
-        <button
-          type="button"
-          onClick={onClose}
-          className="rounded-lg bg-slate-700 px-3 py-2 text-sm font-medium hover:bg-slate-600"
-        >
-          Hủy
-        </button>
-        <button
-          type="button"
-          disabled={!isMatch}
-          onClick={onConfirm}
-          className="inline-flex items-center gap-2 rounded-lg bg-red-600 px-3 py-2 text-sm font-medium text-white hover:bg-red-500 disabled:cursor-not-allowed disabled:bg-slate-700 disabled:text-slate-500"
-        >
-          <LockOpen className="size-4" />
-          Xác nhận Mở khóa (5 phút)
-        </button>
+      <div className="mt-4 flex items-center justify-between gap-4">
+        <p className="text-sm text-slate-400 tabular-nums">
+          Đúng {correctCount}/{expectedChars.length} ký tự
+        </p>
+        <div className="flex gap-2">
+          <button type="button" onClick={onClose} className="btn btn-secondary">
+            Hủy
+          </button>
+          <button type="button" disabled={!isMatch} onClick={onConfirm} className="btn btn-danger">
+            <LockOpen className="size-4" />
+            Xác nhận Mở khóa (5 phút)
+          </button>
+        </div>
       </div>
     </dialog>
   )

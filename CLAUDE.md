@@ -81,6 +81,7 @@ Logic đếm giờ chỉ nằm ở main, không đặt trong React. Vòng lặp 
 | File | Vai trò |
 | --- | --- |
 | `App.tsx` | State tổng, tính `isLocked`, `tempUnlockedUntil` |
+| `components/ui.tsx` | `PageHeader`, `Card` dùng chung. Nút và ô nhập là class `.btn-*`, `.field` trong `assets/main.css` |
 | `components/Sidebar.tsx` | Điều hướng tab, trạng thái khóa, đếm ngược mở khóa tạm thời |
 | `components/DashboardTab.tsx` | Vòng tiến độ, badge trạng thái, lịch sử phiên chơi |
 | `components/BlacklistTab.tsx` | Quản lý game, quét cửa sổ đang mở |
@@ -89,7 +90,13 @@ Logic đếm giờ chỉ nằm ở main, không đặt trong React. Vòng lặp 
 
 `isLocked` chỉ nằm ở renderer: IPC trong main không kiểm tra khóa. `tempUnlockedUntil` không lưu xuống đĩa, tải lại trang sẽ về trạng thái khóa.
 
-#### Thêm một lệnh IPC
+#### Logo và ảnh tài liệu
+
+- Nguồn logo là `src/renderer/src/assets/logo.svg`. Sửa xong chạy `npm run icons` để tạo lại `build/icon.*` và `resources/icon.png`.
+- Ảnh trong README nằm ở `docs/images/`, chụp từ app thật với dữ liệu mẫu. Không chụp danh sách quét cửa sổ vì lộ cửa sổ đang mở trên máy.
+- electron-builder đóng gói mọi file trừ khi loại trừ. Thêm thư mục mới ở gốc repo thì phải thêm vào `files` trong `electron-builder.yml`.
+
+### Thêm một lệnh IPC
 
 1. `src/main/ipcHandlers.ts`: đăng ký `ipcMain.handle('kenh', handler)`.
 2. `src/preload/index.ts`: thêm hàm vào object `api`, gọi `ipcRenderer.invoke('kenh', ...)`.
@@ -135,4 +142,3 @@ CSP nằm trong `src/renderer/index.html` và chỉ cho phép `'self'`. Muốn n
 ### Giá trị mẫu cần thay trước khi phát hành
 
 - `electron-builder.yml`: `publish.url`
-- `build/icon.*`, `resources/icon.png`: vẫn là icon mặc định của template

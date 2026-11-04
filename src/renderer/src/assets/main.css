@@ -1,5 +1,16 @@
 @import 'tailwindcss';
 
+@theme {
+  /* Nhấp nháy nhẹ: animate-pulse làm chữ mờ tới mức khó đọc. */
+  --animate-blink: blink 1.6s ease-in-out infinite;
+
+  @keyframes blink {
+    50% {
+      opacity: 0.75;
+    }
+  }
+}
+
 @layer base {
   :root {
     /* Thanh cuộn, ô chọn giờ và các control gốc của Chromium theo nền tối. */
@@ -18,5 +29,35 @@
 
   button:not(:disabled) {
     cursor: pointer;
+  }
+
+  :focus-visible {
+    @apply outline-2 outline-offset-2 outline-sky-400;
+  }
+}
+
+@layer components {
+  .btn {
+    @apply inline-flex shrink-0 items-center justify-center gap-2 rounded-lg px-3 py-2 text-sm font-medium transition-colors disabled:cursor-not-allowed disabled:opacity-50;
+  }
+
+  .btn-primary {
+    @apply bg-sky-600 text-white not-disabled:hover:bg-sky-500;
+  }
+
+  .btn-secondary {
+    @apply bg-slate-700 text-slate-100 not-disabled:hover:bg-slate-600;
+  }
+
+  .btn-danger {
+    @apply bg-red-600 text-white not-disabled:hover:bg-red-500 disabled:bg-slate-700 disabled:text-slate-300;
+  }
+
+  .btn-delete {
+    @apply rounded-lg p-2 text-slate-400 transition-colors not-disabled:hover:bg-red-500/15 not-disabled:hover:text-red-400 disabled:cursor-not-allowed disabled:opacity-50;
+  }
+
+  .field {
+    @apply rounded-lg border border-slate-600 bg-slate-900 px-3 py-2 text-sm transition-colors placeholder:text-slate-500 focus:border-sky-500 focus:outline-none;
   }
 }

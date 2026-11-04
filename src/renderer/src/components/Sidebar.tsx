@@ -1,4 +1,5 @@
-import { CalendarClock, Gamepad2, LayoutDashboard, Lock, LockOpen, ShieldCheck } from 'lucide-react'
+import { CalendarClock, Gamepad2, LayoutDashboard, Lock, LockOpen } from 'lucide-react'
+import logo from '../assets/logo.svg'
 import { formatClock } from '../lib/format'
 
 export type TabId = 'dashboard' | 'blacklist' | 'schedule'
@@ -26,10 +27,13 @@ function Sidebar({
 }: SidebarProps): React.JSX.Element {
   return (
     <aside className="flex w-60 shrink-0 flex-col gap-6 border-r border-slate-700 bg-slate-800 p-4">
-      <h1 className="flex items-center gap-2 px-2 text-lg font-semibold">
-        <ShieldCheck className="size-6 text-emerald-400" />
-        PlayCurfew
-      </h1>
+      <div className="flex items-center gap-3 px-1">
+        <img src={logo} alt="" className="size-10" />
+        <div>
+          <h1 className="text-base leading-tight font-semibold">PlayCurfew</h1>
+          <p className="text-xs text-slate-400">Giữ kỷ luật giờ chơi</p>
+        </div>
+      </div>
 
       <nav className="flex flex-1 flex-col gap-1">
         {TABS.map(({ id, label, icon: Icon }) => (
@@ -66,11 +70,7 @@ function Sidebar({
             <Lock className="size-4" />
             Cài đặt đang khóa
           </p>
-          <button
-            type="button"
-            onClick={onEmergencyUnlock}
-            className="mt-3 w-full rounded-lg bg-red-600 px-3 py-2 text-sm font-medium text-white hover:bg-red-500"
-          >
+          <button type="button" onClick={onEmergencyUnlock} className="btn btn-danger mt-3 w-full">
             Mở khóa khẩn cấp
           </button>
         </div>

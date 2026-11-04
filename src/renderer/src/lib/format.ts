@@ -12,7 +12,7 @@ export function formatDuration(totalSeconds: number): string {
   const seconds = totalSeconds % 60
 
   if (hours > 0) return `${hours} giờ ${minutes} phút`
-  if (minutes > 0) return `${minutes} phút ${seconds} giây`
+  if (minutes > 0) return seconds > 0 ? `${minutes} phút ${seconds} giây` : `${minutes} phút`
   return `${seconds} giây`
 }
 
