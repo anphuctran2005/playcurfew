@@ -4,6 +4,8 @@ directories:
   buildResources: build
 files:
   - '!**/.vscode/*'
+  - '!.claude/**'
+  - '!{CLAUDE.md,SPEC.md}'
   - '!src/*'
   - '!electron.vite.config.{js,ts,mjs,cjs}'
   - '!{.eslintcache,eslint.config.mjs,.prettierignore,.prettierrc.yaml,dev-app-update.yml,CHANGELOG.md,README.md}'
@@ -14,7 +16,7 @@ asarUnpack:
 win:
   executableName: GameGuard
 nsis:
-  artifactName: ${name}-${version}-setup.${ext}
+  artifactName: GameGuard-Setup.${ext}
   shortcutName: ${productName}
   uninstallDisplayName: ${productName}
   createDesktopShortcut: always

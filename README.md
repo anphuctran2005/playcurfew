@@ -2,6 +2,8 @@
 
 GameGuard là ứng dụng desktop trên Windows giúp bạn tự kiểm soát thời gian chơi game. Ứng dụng đếm số phút chơi mỗi ngày, tự tắt game khi hết giờ hoặc khi đang trong khung giờ học, và làm cho việc nới lỏng các quy tắc đó trở nên khó hơn vào đúng lúc bạn dễ phá lệ nhất.
 
+[![Tải về cho Windows](https://img.shields.io/badge/T%E1%BA%A3i%20v%E1%BB%81%20cho%20Windows-GameGuard--Setup.exe-2563eb?style=for-the-badge)](https://github.com/anphuctran2005/game_guard/releases/latest/download/GameGuard-Setup.exe)
+
 ## Tính năng
 
 - **Giới hạn giờ chơi mỗi ngày:** đặt riêng cho ngày thường (Thứ 2 - Thứ 6) và cuối tuần (Thứ 7 - CN).
@@ -14,10 +16,19 @@ GameGuard là ứng dụng desktop trên Windows giúp bạn tự kiểm soát t
 
 ## Yêu cầu
 
-- Windows 10 hoặc Windows 11
+- Windows 10 hoặc Windows 11 (64-bit)
 - Node.js 20.19+ hoặc 22.12+ (đã kiểm thử với Node 24) và npm, chỉ cần khi cài từ mã nguồn
 
 ## Cài đặt
+
+### Dùng bộ cài
+
+1. Bấm nút **Tải về cho Windows** ở đầu trang.
+2. Chạy file `GameGuard-Setup.exe` vừa tải. Ứng dụng tự cài và mở lên, đồng thời tạo lối tắt trên Desktop.
+
+Bộ cài chưa được ký số nên Windows có thể hiện cảnh báo SmartScreen. Bấm **More info** rồi **Run anyway** để tiếp tục.
+
+### Cài từ mã nguồn
 
 Tải dependency:
 
@@ -39,7 +50,7 @@ Tạo bộ cài cho Windows:
 npm run build:win
 ```
 
-Bộ cài nằm tại `dist/gameguard-1.0.0-setup.exe`. Chạy file này để cài GameGuard như một ứng dụng bình thường.
+Bộ cài nằm tại `dist/GameGuard-Setup.exe`.
 
 ## Hướng dẫn sử dụng
 
