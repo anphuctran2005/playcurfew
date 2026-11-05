@@ -105,8 +105,16 @@ Logic đếm giờ chỉ nằm ở main, không đặt trong React. Vòng lặp 
 
 - Nguồn logo là `src/renderer/src/assets/logo.svg`. Sửa xong chạy `npm run icons` để tạo lại `build/icon.*` và `resources/icon.png`.
 - `README.md` là bản tiếng Anh gốc, `README.vi.md` là bản tiếng Việt. Sửa một bản thì sửa cả bản kia.
-- Ảnh trong README nằm ở `docs/images/`, chụp từ app thật với dữ liệu mẫu. Không chụp danh sách quét cửa sổ vì lộ cửa sổ đang mở trên máy.
+- Ảnh trong README nằm ở `docs/images/en/` và `docs/images/vi/`, chụp từ app thật với dữ liệu mẫu. Không chụp danh sách quét cửa sổ vì lộ cửa sổ đang mở trên máy.
 - electron-builder đóng gói mọi file trừ khi loại trừ. Thêm thư mục mới ở gốc repo thì phải thêm vào `files` trong `electron-builder.yml`.
+
+### Ngôn ngữ và giao diện
+
+- Mọi chữ hiển thị nằm trong `src/shared/i18n.ts`, dùng chung cho main và renderer. Thêm chữ mới thì thêm vào cả `vi` và `en`. Renderer dùng `useT()`, main dùng `translateMain()`.
+- Câu cam kết mặc định đổi theo ngôn ngữ qua `getCommitmentPhrase()`. Câu người dùng tự đặt thì giữ nguyên, và main xác minh theo đúng câu đang hiển thị.
+- Nền sáng đảo thang `slate` bằng biến CSS trong `assets/main.css`. Chữ đặt trên nền `slate` phải dùng `text-slate-*`, không dùng `text-white`.
+- Nền tùy biến có thể sáng hay tối bất kỳ, nên chữ nằm trực tiếp trên nền phải có lớp nền `bg-slate-800`.
+- `getConfig()` gộp với `DEFAULT_CONFIG`: electron-store không điền trường mới vào `config` đã lưu.
 
 ### Thêm một lệnh IPC
 

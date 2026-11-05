@@ -1,8 +1,8 @@
 import { app, Menu, nativeImage, Tray, type BrowserWindow } from 'electron'
 import icon from '../../resources/icon.png?asset'
 import { getDashboardState, isSystemLocked } from './processMonitor'
+import { translateMain } from './store'
 
-const TOOLTIP = 'PlayCurfew - Đang bảo vệ giờ học của bạn'
 const ICON_SIZE = 32
 
 // Giữ tham chiếu ở cấp module: Tray bị thu gom rác thì icon sẽ biến mất.
@@ -20,26 +20,25 @@ export function showMainWindow(): void {
 
 function getStatusLabel(): string {
   const { isFocusActive, remainingSeconds, runningGames } = getDashboardState()
-  if (isFocusActive) return '🔴 Đang khóa (Giờ Focus)'
-  if (remainingSeconds <= 0) return '🔴 Đang khóa (Hết giờ)'
+  if (isFocusActive) return translateMain('trayFocus')
+  if (remainingSeconds <= 0) return translateMain('trayOutOfTime')
 
   const minutes = Math.ceil(remainingSeconds / 60)
-  return runningGames.length > 0
-    ? `🟡 Đang chơi - Còn lại: ${minutes} phút`
-    : `🟢 Còn lại: ${minutes} phút`
+  return translateMain(runningGames.length > 0 ? 'trayPlaying' : 'trayRemaining', { minutes })
 }
 
 export function updateTrayMenu(): void {
   if (!tray) return
 
   const isLocked = isSystemLocked()
+  tray.setToolTip(translateMain('trayTooltip'))
   tray.setContextMenu(
     Menu.buildFromTemplate([
       { label: getStatusLabel(), enabled: false },
-      { label: 'Mở bảng điều khiển', click: showMainWindow },
+      { label: translateMain('trayOpen'), click: showMainWindow },
       { type: 'separator' },
       {
-        label: isLocked ? '🔒 Thoát PlayCurfew (Đang khóa - Mở app để Unlock)' : 'Thoát PlayCurfew',
+        label: translateMain(isLocked ? 'trayQuitLocked' : 'trayQuit'),
         enabled: !isLocked,
         // Menu cập nhật mỗi 5 giây nên có thể cũ: kiểm tra lại lúc bấm.
         click: () => {
@@ -55,7 +54,6 @@ export function createTray(windowGetter: () => BrowserWindow | null): void {
 
   const image = nativeImage.createFromPath(icon).resize({ width: ICON_SIZE, height: ICON_SIZE })
   tray = new Tray(image)
-  tray.setToolTip(TOOLTIP)
   tray.on('click', showMainWindow)
   tray.on('double-click', showMainWindow)
   updateTrayMenu()

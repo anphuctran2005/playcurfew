@@ -18,7 +18,7 @@
   <a href="https://github.com/anphuctran2005/playcurfew/releases/latest/download/PlayCurfew-Setup.exe"><img src="https://img.shields.io/badge/T%E1%BA%A3i%20v%E1%BB%81%20cho%20Windows-PlayCurfew--Setup.exe-2563eb?style=for-the-badge" alt="Tải về cho Windows" /></a>
 </p>
 
-![Màn hình Tổng quan của PlayCurfew](docs/images/01-tong-quan.png)
+![Màn hình Tổng quan của PlayCurfew](docs/images/vi/01-overview.png)
 
 ## Tính năng
 
@@ -31,6 +31,8 @@
 - **Lịch sử:** xem các phiên chơi trong ngày với giờ bắt đầu và thời lượng.
 - **Chạy ngầm:** đóng cửa sổ chỉ thu xuống khay hệ thống, ứng dụng vẫn theo dõi. Nút Thoát bị khóa khi đang khóa cài đặt.
 - **Khởi động cùng Windows:** tự chạy ngầm dưới khay hệ thống khi bật máy.
+- **Hai ngôn ngữ:** chuyển giữa tiếng Việt và tiếng Anh bất cứ lúc nào, gồm cả menu khay và thông báo.
+- **Tùy biến nền:** chọn nền sáng hoặc tối, màu nền bất kỳ, hoặc ảnh của riêng bạn.
 
 ## Yêu cầu
 
@@ -84,7 +86,7 @@ Mở tab **Danh sách game**. Có hai cách thêm game:
 - **Nhập tay:** điền tên hiển thị và tên file, ví dụ `masterduel.exe`, rồi bấm **Thêm**.
 - **Quét ứng dụng đang mở:** mở game trước, bấm nút quét, chọn cửa sổ của game trong danh sách, sửa tên hiển thị nếu cần rồi bấm **Thêm**.
 
-![Thêm game vào danh sách](docs/images/02-them-game.png)
+![Thêm game vào danh sách](docs/images/vi/02-add-game.png)
 
 Dùng công tắc để bật hoặc tắt theo dõi từng game.
 
@@ -97,7 +99,7 @@ Mở tab **Giới hạn & Focus**.
 - **Giới hạn mỗi ngày:** kéo thanh trượt hoặc nhập số phút, rồi bấm **Lưu cấu hình**.
 - **Khung giờ Focus:** nhập nhãn, giờ bắt đầu và kết thúc theo dạng 24 giờ (ví dụ `19:30`), chọn các ngày trong tuần rồi bấm **Thêm khung giờ**. Giờ kết thúc nhỏ hơn giờ bắt đầu nghĩa là kết thúc vào hôm sau.
 
-![Cài đặt giới hạn và khung giờ Focus](docs/images/03-gioi-han-focus.png)
+![Cài đặt giới hạn và khung giờ Focus](docs/images/vi/03-limits-focus.png)
 
 Khung giờ đã tạo có thể bật, tắt, thêm hoặc bớt ngày, và xóa. Để đổi giờ, hãy xóa rồi tạo khung giờ mới.
 
@@ -113,11 +115,11 @@ Vòng tròn cho biết số phút đã chơi trên giới hạn hôm nay:
 
 Khi bạn mở một game trong danh sách, thanh trạng thái chuyển sang màu vàng và thời gian bắt đầu được tính:
 
-![Màn hình khi đang chơi game](docs/images/04-dang-choi.png)
+![Màn hình khi đang chơi game](docs/images/vi/04-playing.png)
 
 Trong giờ Focus, thanh trạng thái và vòng tròn chuyển sang màu đỏ, game đang mở sẽ bị tắt:
 
-![Màn hình trong giờ Focus](docs/images/08-gio-focus.png)
+![Màn hình trong giờ Focus](docs/images/vi/08-focus-time.png)
 
 ### Chạy ngầm và khay hệ thống
 
@@ -125,11 +127,29 @@ Bấm nút đóng cửa sổ chỉ thu ứng dụng xuống khay hệ thống, c
 
 Bật **Khởi động cùng Windows** ở đầu tab **Giới hạn & Focus** để ứng dụng tự chạy ngầm mỗi khi đăng nhập. Tùy chọn này tạo tác vụ `PlayCurfewAutoStart` trong Task Scheduler.
 
+### Ngôn ngữ và giao diện
+
+Dùng nút **VI / EN** ở thanh bên để đổi ngôn ngữ bất cứ lúc nào. Menu khay, thông báo và câu cam kết sẽ đổi theo.
+
+Mở tab **Cài đặt** để tùy biến ứng dụng:
+
+- **Giao diện:** chọn **Tối** hoặc **Sáng**.
+- **Màu nền:** chọn màu có sẵn hoặc bấm **Chọn màu khác** để dùng màu bất kỳ. **Mặc định** trả về màu của giao diện.
+- **Ảnh nền:** bấm **Chọn ảnh** rồi chọn file PNG, JPG hoặc WebP tối đa 10 MB. Ảnh nền được ưu tiên hơn màu nền.
+
+![Tab Cài đặt](docs/images/vi/09-settings.png)
+
+| Nền sáng | Ảnh nền |
+| --- | --- |
+| ![Nền sáng](docs/images/vi/10-light-theme.png) | ![Ảnh nền tùy chọn](docs/images/vi/11-background-image.png) |
+
+Các cài đặt này không bị khóa.
+
 ### Cơ chế khóa
 
 Cài đặt tự khóa khi có một trong ba điều kiện: đang trong giờ Focus, đã hết giờ chơi hôm nay, hoặc đang có game được theo dõi chạy. Các thao tác bị khóa hiện biểu tượng ổ khóa.
 
-![Danh sách game khi đang khóa](docs/images/05-dang-khoa.png)
+![Danh sách game khi đang khóa](docs/images/vi/05-locked.png)
 
 | Thao tác | Khi đang khóa |
 | --- | --- |
@@ -148,11 +168,11 @@ Cài đặt tự khóa khi có một trong ba điều kiện: đang trong giờ 
 2. Gõ lại chính xác câu cam kết, gồm cả dấu câu và chữ hoa, chữ thường. Không thể dán văn bản. Ký tự đúng hiện màu xanh, ký tự sai hiện nền đỏ.
 3. Khi câu khớp hoàn toàn, nút **Xác nhận Mở khóa (5 phút)** sáng lên. Bấm nút này.
 
-![Gõ lại câu cam kết để mở khóa](docs/images/06-mo-khoa-khan-cap.png)
+![Gõ lại câu cam kết để mở khóa](docs/images/vi/06-emergency-unlock.png)
 
 Thanh bên sẽ hiện đồng hồ đếm ngược. Hết 5 phút, cài đặt tự khóa lại. Mở khóa chỉ cho phép sửa cài đặt và thoát ứng dụng: game vẫn bị tắt nếu đang trong giờ Focus hoặc đã hết giờ.
 
-![Đồng hồ đếm ngược khi mở khóa tạm thời](docs/images/07-mo-khoa-tam-thoi.png)
+![Đồng hồ đếm ngược khi mở khóa tạm thời](docs/images/vi/07-temp-unlock.png)
 
 ## Dữ liệu
 

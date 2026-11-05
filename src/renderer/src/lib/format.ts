@@ -1,3 +1,5 @@
+import type { Translate } from './i18n'
+
 /** Đồng hồ đếm ngược dạng mm:ss. */
 export function formatClock(ms: number): string {
   const totalSeconds = Math.ceil(ms / 1000)
@@ -6,18 +8,22 @@ export function formatClock(ms: number): string {
   return `${minutes}:${seconds}`
 }
 
-export function formatDuration(totalSeconds: number): string {
+export function formatDuration(totalSeconds: number, t: Translate): string {
   const hours = Math.floor(totalSeconds / 3600)
   const minutes = Math.floor((totalSeconds % 3600) / 60)
   const seconds = totalSeconds % 60
 
-  if (hours > 0) return `${hours} giờ ${minutes} phút`
-  if (minutes > 0) return seconds > 0 ? `${minutes} phút ${seconds} giây` : `${minutes} phút`
-  return `${seconds} giây`
+  if (hours > 0) return t('durationHours', { hours, minutes })
+  if (minutes > 0) {
+    return seconds > 0
+      ? t('durationMinutesSeconds', { minutes, seconds })
+      : t('durationMinutes', { minutes })
+  }
+  return t('durationSeconds', { seconds })
 }
 
-export function formatTime(iso: string): string {
-  return new Date(iso).toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' })
+export function formatTime(iso: string, locale: string): string {
+  return new Date(iso).toLocaleTimeString(locale, { hour: '2-digit', minute: '2-digit' })
 }
 
 /** Bỏ tiền tố mà Electron thêm vào lỗi ném từ ipcMain.handle. */

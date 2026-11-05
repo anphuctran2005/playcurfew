@@ -20,6 +20,10 @@ const api: WindowApi = {
   updateFocusSchedule: (id, patch) => ipcRenderer.invoke('update-focus-schedule', id, patch),
   removeFocusSchedule: (id) => ipcRenderer.invoke('remove-focus-schedule', id),
 
+  getBackgroundImage: () => ipcRenderer.invoke('get-background-image'),
+  pickBackgroundImage: () => ipcRenderer.invoke('pick-background-image'),
+  removeBackgroundImage: () => ipcRenderer.invoke('remove-background-image'),
+
   verifyEmergencyUnlock: (input) => ipcRenderer.invoke('verify-emergency-unlock', input),
 
   onTickUpdate: (callback) => {

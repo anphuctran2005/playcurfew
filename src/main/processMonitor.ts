@@ -1,6 +1,7 @@
 import { execFile } from 'child_process'
 import { promisify } from 'util'
 import { BrowserWindow, Notification } from 'electron'
+import { getCommitmentPhrase } from '../shared/i18n'
 import type { DashboardState, FocusSchedule, GameItem, RunningProcess } from '../shared/types'
 import {
   addUsageSeconds,
@@ -10,7 +11,8 @@ import {
   getLimitSeconds,
   getTodayUsage,
   isValidExeName,
-  toDateKey
+  toDateKey,
+  translateMain
 } from './store'
 
 const TICK_INTERVAL_MS = 5000
@@ -150,7 +152,7 @@ export function getDashboardState(): DashboardState {
 
 export function verifyEmergencyUnlock(input: string): DashboardState {
   // NFC vì một số bộ gõ tiếng Việt sinh dấu rời, trông giống hệt nhưng khác mã ký tự.
-  if (input.normalize('NFC') === getConfig().commitmentPhrase.normalize('NFC')) {
+  if (input.normalize('NFC') === getCommitmentPhrase(getConfig()).normalize('NFC')) {
     tempUnlockedUntil = Date.now() + TEMP_UNLOCK_MS
   }
   return getDashboardState()
@@ -168,8 +170,10 @@ async function enforceBlock(games: GameItem[], isFocus: boolean): Promise<void> 
   lastViolationNoticeAt = now
 
   const names = games.map((game) => game.name).join(', ')
-  if (isFocus) notify('Đang trong giờ Focus', `Đã tắt ${names}. Quay lại việc học nhé!`)
-  else notify('Đã hết giờ chơi hôm nay', `Đã tắt ${names}.`)
+  if (isFocus)
+    notify(translateMain('noticeFocusTitle'), translateMain('noticeFocusBody', { names }))
+  else
+    notify(translateMain('noticeOutOfTimeTitle'), translateMain('noticeOutOfTimeBody', { names }))
 }
 
 function checkWarnings(remainingSeconds: number): void {
@@ -188,7 +192,10 @@ function checkWarnings(remainingSeconds: number): void {
 
   // Mở app khi đã vượt nhiều mốc thì chỉ báo một lần, nhưng vẫn đánh dấu đủ các mốc.
   crossed.forEach((mark) => warnedMarks.add(mark))
-  notify('Sắp hết giờ chơi', `Còn khoảng ${Math.ceil(remainingSeconds / 60)} phút chơi hôm nay.`)
+  notify(
+    translateMain('noticeWarningTitle'),
+    translateMain('noticeWarningBody', { minutes: Math.ceil(remainingSeconds / 60) })
+  )
 }
 
 async function tick(getWindow: () => BrowserWindow | null, onTick: () => void): Promise<void> {

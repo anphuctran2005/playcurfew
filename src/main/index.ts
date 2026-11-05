@@ -5,7 +5,7 @@ import icon from '../../resources/icon.png?asset'
 import { disableAdminAutoStart, enableAdminAutoStart, HIDDEN_FLAG } from './autoStartAdmin'
 import { registerIpcHandlers } from './ipcHandlers'
 import { notify, startMonitor } from './processMonitor'
-import { getConfig } from './store'
+import { getConfig, translateMain } from './store'
 import { createTray, showMainWindow, updateTrayMenu } from './tray'
 
 let mainWindow: BrowserWindow | null = null
@@ -49,7 +49,7 @@ function createWindow(): void {
 
     if (!hasShownTrayNotice) {
       hasShownTrayNotice = true
-      notify('PlayCurfew', 'PlayCurfew vẫn đang chạy ngầm dưới khay hệ thống.')
+      notify('PlayCurfew', translateMain('noticeTray'))
     }
   })
 

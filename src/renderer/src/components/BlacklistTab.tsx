@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import { Gamepad2, LoaderCircle, Lock, Plus, ScanSearch, Trash2, TriangleAlert } from 'lucide-react'
 import type { GameItem, RunningProcess } from '../../../shared/types'
 import { errorMessage } from '../lib/format'
+import { useT } from '../lib/i18n'
 import LockNotice from './LockNotice'
 import Toggle from './Toggle'
 import { Card, PageHeader } from './ui'
@@ -18,6 +19,7 @@ function toWindowList(processes: RunningProcess[]): RunningProcess[] {
 }
 
 function BlacklistTab({ isLocked }: { isLocked: boolean }): React.JSX.Element {
+  const t = useT()
   const [games, setGames] = useState<GameItem[]>([])
   const [name, setName] = useState('')
   const [exeName, setExeName] = useState('')
@@ -45,7 +47,7 @@ function BlacklistTab({ isLocked }: { isLocked: boolean }): React.JSX.Element {
     event.preventDefault()
     const exe = exeName.trim()
     if (hasExe(games, exe)) {
-      setError(`${exe} đã có trong danh sách.`)
+      setError(t('gamesDuplicate', { exe }))
       return
     }
 
@@ -78,16 +80,13 @@ function BlacklistTab({ isLocked }: { isLocked: boolean }): React.JSX.Element {
 
   return (
     <div className="mx-auto flex max-w-4xl flex-col gap-4">
-      <PageHeader
-        title="Danh sách game"
-        subtitle="Game được bật theo dõi sẽ bị tính giờ và tự tắt khi vi phạm."
-      />
+      <PageHeader title={t('tabGames')} subtitle={t('gamesSubtitle')} />
 
-      {isLocked && <LockNotice>Không thể tắt theo dõi hoặc xóa game lúc này.</LockNotice>}
-      {error && <p className="text-sm text-red-400">{error}</p>}
+      {isLocked && <LockNotice>{t('gamesLocked')}</LockNotice>}
+      {error && <p className="page-error">{error}</p>}
 
       <Card
-        title="Thêm game"
+        title={t('gamesAddTitle')}
         action={
           <button
             type="button"
@@ -100,7 +99,7 @@ function BlacklistTab({ isLocked }: { isLocked: boolean }): React.JSX.Element {
             ) : (
               <ScanSearch className="size-4" />
             )}
-            Quét ứng dụng đang mở
+            {t('gamesScan')}
           </button>
         }
       >
@@ -109,15 +108,15 @@ function BlacklistTab({ isLocked }: { isLocked: boolean }): React.JSX.Element {
             <input
               value={name}
               onChange={(e) => setName(e.target.value)}
-              placeholder="Tên hiển thị"
-              aria-label="Tên hiển thị"
+              placeholder={t('gamesDisplayName')}
+              aria-label={t('gamesDisplayName')}
               className="field min-w-0"
             />
             <input
               value={exeName}
               onChange={(e) => setExeName(e.target.value)}
-              placeholder="ten-game.exe"
-              aria-label="Tên file exe"
+              placeholder={t('gamesExePlaceholder')}
+              aria-label={t('gamesExeLabel')}
               className="field min-w-0"
             />
             <button
@@ -126,7 +125,7 @@ function BlacklistTab({ isLocked }: { isLocked: boolean }): React.JSX.Element {
               className="btn btn-primary"
             >
               <Plus className="size-4" />
-              Thêm
+              {t('gamesAdd')}
             </button>
           </form>
 
@@ -134,11 +133,10 @@ function BlacklistTab({ isLocked }: { isLocked: boolean }): React.JSX.Element {
             <div className="flex flex-col gap-2">
               <p className="flex items-start gap-2 text-xs text-amber-300">
                 <TriangleAlert className="mt-0.5 size-4 shrink-0" />
-                Ứng dụng được thêm sẽ bị buộc tắt khi đang trong giờ Focus hoặc hết giờ chơi, dữ
-                liệu chưa lưu sẽ mất.
+                {t('gamesScanWarning')}
               </p>
               {windows.length === 0 ? (
-                <p className="text-sm text-slate-400">Không tìm thấy cửa sổ nào đang mở.</p>
+                <p className="text-sm text-slate-400">{t('gamesNoWindows')}</p>
               ) : (
                 <ul className="max-h-52 divide-y divide-slate-700 overflow-y-auto rounded-lg border border-slate-700">
                   {windows.map((process) => {
@@ -153,7 +151,7 @@ function BlacklistTab({ isLocked }: { isLocked: boolean }): React.JSX.Element {
                         >
                           <span className="min-w-0 truncate">{process.windowTitle}</span>
                           <span className="shrink-0 text-xs text-slate-400">
-                            {isAdded ? 'Đã có' : process.exeName}
+                            {isAdded ? t('gamesAlreadyAdded') : process.exeName}
                           </span>
                         </button>
                       </li>
@@ -166,9 +164,9 @@ function BlacklistTab({ isLocked }: { isLocked: boolean }): React.JSX.Element {
         </div>
       </Card>
 
-      <Card title={`Game đang kiểm soát (${games.length})`}>
+      <Card title={t('gamesListTitle', { count: games.length })}>
         {games.length === 0 ? (
-          <p className="px-4 py-6 text-center text-sm text-slate-400">Chưa có game nào.</p>
+          <p className="px-4 py-6 text-center text-sm text-slate-400">{t('gamesEmpty')}</p>
         ) : (
           <ul className="divide-y divide-slate-700">
             {games.map((game) => (
@@ -188,15 +186,15 @@ function BlacklistTab({ isLocked }: { isLocked: boolean }): React.JSX.Element {
                 </div>
                 <Toggle
                   checked={game.isActive}
-                  label={`Theo dõi ${game.name}`}
+                  label={t('gamesTrack', { name: game.name })}
                   isLocked={isLocked}
                   onChange={(isActive) => run(() => window.api.updateGame(game.id, { isActive }))}
                 />
                 <button
                   type="button"
                   disabled={isLocked}
-                  aria-label={`Xóa ${game.name}`}
-                  title={isLocked ? 'Đang khóa: dùng "Mở khóa khẩn cấp" để xóa' : undefined}
+                  aria-label={t('deleteItem', { name: game.name })}
+                  title={isLocked ? t('deleteLockedTitle') : undefined}
                   onClick={() => run(() => window.api.removeGame(game.id))}
                   className="btn-delete"
                 >

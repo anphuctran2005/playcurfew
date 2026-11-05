@@ -1,5 +1,6 @@
 import { randomUUID } from 'crypto'
 import Store from 'electron-store'
+import { translate, type MessageKey, type MessageParams } from '../shared/i18n'
 import type {
   AppConfig,
   DailyUsage,
@@ -34,8 +35,19 @@ export function toDateKey(date: Date = new Date()): string {
 }
 
 const LEGACY_COMMITMENT_PHRASE = 'Tôi hiểu rằng tôi đang phá vỡ cam kết học tập của chính mình'
-const DEFAULT_COMMITMENT_PHRASE =
-  'Tôi xác nhận đang tự phá vỡ kỷ luật của bản thân và việc mở khóa lúc này sẽ làm ảnh hưởng trực tiếp đến mục tiêu học tập cũng như công việc của tôi.'
+const DEFAULT_COMMITMENT_PHRASE = translate('vi', 'commitmentPhrase')
+
+const DEFAULT_CONFIG: AppConfig = {
+  weekdayLimitMinutes: 60,
+  weekendLimitMinutes: 120,
+  warningMinutesLeft: [5, 1],
+  commitmentPhrase: DEFAULT_COMMITMENT_PHRASE,
+  launchAtStartup: false,
+  language: 'vi',
+  theme: 'dark',
+  backgroundColor: null,
+  backgroundImageFile: null
+}
 
 function emptyUsage(): DailyUsage {
   return { date: toDateKey(), usedSeconds: 0, sessions: [] }
@@ -43,13 +55,7 @@ function emptyUsage(): DailyUsage {
 
 const store = new Store<StoreSchema>({
   defaults: {
-    config: {
-      weekdayLimitMinutes: 60,
-      weekendLimitMinutes: 120,
-      warningMinutesLeft: [5, 1],
-      commitmentPhrase: DEFAULT_COMMITMENT_PHRASE,
-      launchAtStartup: false
-    },
+    config: DEFAULT_CONFIG,
     games: [
       {
         id: 'default-master-duel',
@@ -84,7 +90,12 @@ if (store.get('config').commitmentPhrase === LEGACY_COMMITMENT_PHRASE) {
 }
 
 export function getConfig(): AppConfig {
-  return store.get('config')
+  // electron-store chỉ điền key còn thiếu ở cấp ngoài: config cũ sẽ thiếu các trường mới.
+  return { ...DEFAULT_CONFIG, ...store.get('config') }
+}
+
+export function translateMain(key: MessageKey, params?: MessageParams): string {
+  return translate(getConfig().language, key, params)
 }
 
 export function updateConfig(patch: Partial<AppConfig>): AppConfig {
@@ -135,7 +146,8 @@ export function getGames(): GameItem[] {
 }
 
 export function addGame(game: NewGame): GameItem {
-  if (!isValidExeName(game.exeName)) throw new Error(`Tên file không hợp lệ: ${game.exeName}`)
+  if (!isValidExeName(game.exeName))
+    throw new Error(translateMain('errorInvalidExe', { exe: game.exeName }))
 
   const games = getGames()
   const existing = games.find((g) => g.exeName.toLowerCase() === game.exeName.toLowerCase())
@@ -148,12 +160,12 @@ export function addGame(game: NewGame): GameItem {
 
 export function updateGame(id: string, patch: Partial<NewGame>): GameItem {
   if (patch.exeName !== undefined && !isValidExeName(patch.exeName)) {
-    throw new Error(`Tên file không hợp lệ: ${patch.exeName}`)
+    throw new Error(translateMain('errorInvalidExe', { exe: patch.exeName }))
   }
 
   const games = getGames()
   const game = games.find((g) => g.id === id)
-  if (!game) throw new Error(`Không tìm thấy game: ${id}`)
+  if (!game) throw new Error(translateMain('errorGameNotFound', { id }))
 
   const updated = { ...game, ...patch, id }
   store.set(
@@ -183,7 +195,7 @@ export function addFocusSchedule(schedule: NewFocusSchedule): FocusSchedule {
 export function updateFocusSchedule(id: string, patch: Partial<NewFocusSchedule>): FocusSchedule {
   const schedules = getFocusSchedules()
   const schedule = schedules.find((s) => s.id === id)
-  if (!schedule) throw new Error(`Không tìm thấy khung giờ: ${id}`)
+  if (!schedule) throw new Error(translateMain('errorScheduleNotFound', { id }))
 
   const updated = { ...schedule, ...patch, id }
   store.set(

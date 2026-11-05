@@ -1,4 +1,5 @@
 import { Lock } from 'lucide-react'
+import { useT } from '../lib/i18n'
 
 interface ToggleProps {
   checked: boolean
@@ -16,6 +17,7 @@ function Toggle({
   lockBothWays = false,
   onChange
 }: ToggleProps): React.JSX.Element {
+  const t = useT()
   const isDisabled = isLocked && (checked || lockBothWays)
 
   return (
@@ -26,7 +28,7 @@ function Toggle({
         role="switch"
         aria-checked={checked}
         aria-label={label}
-        title={isDisabled ? 'Đang khóa: dùng "Mở khóa khẩn cấp" để thay đổi' : undefined}
+        title={isDisabled ? t('toggleLockedTitle') : undefined}
         disabled={isDisabled}
         onClick={() => onChange(!checked)}
         className={`relative h-6 w-11 shrink-0 rounded-full transition-colors disabled:opacity-50 ${

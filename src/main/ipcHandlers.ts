@@ -1,5 +1,6 @@
-import { ipcMain } from 'electron'
+import { BrowserWindow, ipcMain } from 'electron'
 import type { AppConfig, NewFocusSchedule, NewGame } from '../shared/types'
+import { getBackgroundImage, pickBackgroundImage, removeBackgroundImage } from './background'
 import { getDashboardState, getRunningProcesses, verifyEmergencyUnlock } from './processMonitor'
 import {
   addFocusSchedule,
@@ -25,8 +26,16 @@ export function registerIpcHandlers(applyAutoStart: (enabled: boolean) => Promis
   ipcMain.handle('update-config', async (_, patch: Partial<AppConfig>) => {
     // Áp dụng trước khi lưu: lỗi thì công tắc giữ nguyên, không báo bật khi chưa có task.
     if (patch.launchAtStartup !== undefined) await applyAutoStart(patch.launchAtStartup)
-    return updateConfig(patch)
+    const config = updateConfig(patch)
+    updateTrayMenu()
+    return config
   })
+
+  ipcMain.handle('get-background-image', () => getBackgroundImage())
+  ipcMain.handle('pick-background-image', (event) =>
+    pickBackgroundImage(BrowserWindow.fromWebContents(event.sender))
+  )
+  ipcMain.handle('remove-background-image', () => removeBackgroundImage())
 
   ipcMain.handle('get-games', () => getGames())
   ipcMain.handle('add-game', (_, game: NewGame) => addGame(game))

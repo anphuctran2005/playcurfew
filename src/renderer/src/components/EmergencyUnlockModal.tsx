@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
 import { LockOpen, X } from 'lucide-react'
+import { useT } from '../lib/i18n'
 
 interface EmergencyUnlockModalProps {
   phrase: string
@@ -25,6 +26,7 @@ function EmergencyUnlockModal({
   onConfirm,
   onClose
 }: EmergencyUnlockModalProps): React.JSX.Element {
+  const t = useT()
   const dialogRef = useRef<HTMLDialogElement>(null)
   const [input, setInput] = useState('')
   const [error, setError] = useState('')
@@ -43,7 +45,7 @@ function EmergencyUnlockModal({
 
   const confirm = async (): Promise<void> => {
     const isUnlocked = await onConfirm(input)
-    if (!isUnlocked) setError('Câu cam kết không khớp, hãy thử lại.')
+    if (!isUnlocked) setError(t('unlockMismatch'))
   }
 
   return (
@@ -53,20 +55,18 @@ function EmergencyUnlockModal({
       className="m-auto w-full max-w-2xl rounded-xl border border-slate-700 bg-slate-800 p-6 text-slate-100 backdrop:bg-black/70"
     >
       <div className="flex items-start justify-between gap-4">
-        <h2 className="text-lg font-semibold">Mở khóa khẩn cấp</h2>
+        <h2 className="text-lg font-semibold">{t('emergencyUnlock')}</h2>
         <button
           type="button"
           onClick={onClose}
-          aria-label="Đóng"
-          className="rounded-lg p-1 text-slate-400 hover:bg-slate-700 hover:text-white"
+          aria-label={t('unlockClose')}
+          className="rounded-lg p-1 text-slate-400 hover:bg-slate-700 hover:text-slate-100"
         >
           <X className="size-5" />
         </button>
       </div>
 
-      <p className="mt-2 text-sm text-slate-400">
-        Gõ lại chính xác câu dưới đây, gồm cả dấu câu và chữ hoa/thường. Không thể dán văn bản.
-      </p>
+      <p className="mt-2 text-sm text-slate-400">{t('unlockInstruction')}</p>
 
       <p className="mt-4 rounded-lg bg-slate-900 p-4 leading-relaxed whitespace-pre-wrap select-none">
         {expectedChars.map((char, index) => (
@@ -88,7 +88,7 @@ function EmergencyUnlockModal({
         autoFocus
         spellCheck={false}
         autoComplete="off"
-        aria-label="Gõ lại câu cam kết"
+        aria-label={t('unlockInputAria')}
         className="field mt-4 w-full resize-none"
       />
 
@@ -96,15 +96,15 @@ function EmergencyUnlockModal({
 
       <div className="mt-4 flex items-center justify-between gap-4">
         <p className="text-sm text-slate-400 tabular-nums">
-          Đúng {correctCount}/{expectedChars.length} ký tự
+          {t('unlockProgress', { correct: correctCount, total: expectedChars.length })}
         </p>
         <div className="flex gap-2">
           <button type="button" onClick={onClose} className="btn btn-secondary">
-            Hủy
+            {t('unlockCancel')}
           </button>
           <button type="button" disabled={!isMatch} onClick={confirm} className="btn btn-danger">
             <LockOpen className="size-4" />
-            Xác nhận Mở khóa (5 phút)
+            {t('unlockConfirm')}
           </button>
         </div>
       </div>

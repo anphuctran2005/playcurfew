@@ -14,12 +14,19 @@ export interface FocusSchedule {
   isEnabled: boolean
 }
 
+export type Language = 'vi' | 'en'
+export type ThemeMode = 'dark' | 'light'
+
 export interface AppConfig {
   weekdayLimitMinutes: number // Giới hạn phút chơi từ Thứ 2 - Thứ 6
   weekendLimitMinutes: number // Giới hạn phút chơi Thứ 7 - CN
   warningMinutesLeft: number[] // Mốc cảnh báo trước khi tắt
   commitmentPhrase: string // Câu bắt buộc gõ khi muốn mở khóa khẩn cấp
   launchAtStartup: boolean // Khởi động cùng Windows
+  language: Language
+  theme: ThemeMode
+  backgroundColor: string | null // Mã màu hex, null là màu mặc định của theme
+  backgroundImageFile: string | null // Tên file trong userData
 }
 
 export interface SessionLog {
@@ -74,6 +81,11 @@ export interface WindowApi {
   addFocusSchedule: (schedule: NewFocusSchedule) => Promise<FocusSchedule>
   updateFocusSchedule: (id: string, patch: Partial<NewFocusSchedule>) => Promise<FocusSchedule>
   removeFocusSchedule: (id: string) => Promise<void>
+
+  /** Các hàm ảnh nền trả về data URL. `pick` trả về null nếu người dùng hủy. */
+  getBackgroundImage: () => Promise<string | null>
+  pickBackgroundImage: () => Promise<string | null>
+  removeBackgroundImage: () => Promise<void>
 
   /** Đúng câu cam kết thì trạng thái trả về có `tempUnlockedUntil` khác null. */
   verifyEmergencyUnlock: (input: string) => Promise<DashboardState>

@@ -1,0 +1,299 @@
+import type { AppConfig, Language } from './types'
+
+const vi = {
+  // Chung
+  tagline: 'Giữ kỷ luật giờ chơi',
+  tabDashboard: 'Tổng quan',
+  tabGames: 'Danh sách game',
+  tabSchedule: 'Giới hạn & Focus',
+  tabSettings: 'Cài đặt',
+  languageLabel: 'Ngôn ngữ',
+  settingsLocked: 'Cài đặt đang khóa',
+  settingsOpen: 'Cài đặt đang mở',
+  tempUnlock: 'Mở khóa tạm thời',
+  emergencyUnlock: 'Mở khóa khẩn cấp',
+  lockHint: 'Bấm "Mở khóa khẩn cấp" ở thanh bên để mở tạm thời trong 5 phút.',
+  toggleLockedTitle: 'Đang khóa: dùng "Mở khóa khẩn cấp" để thay đổi',
+  deleteLockedTitle: 'Đang khóa: dùng "Mở khóa khẩn cấp" để xóa',
+  deleteItem: 'Xóa {name}',
+
+  // Thời lượng
+  durationHours: '{hours} giờ {minutes} phút',
+  durationMinutesSeconds: '{minutes} phút {seconds} giây',
+  durationMinutes: '{minutes} phút',
+  durationSeconds: '{seconds} giây',
+
+  // Tổng quan
+  statusFocus: 'Đang khóa: Giờ tập trung học tập',
+  statusOutOfTime: 'Đã hết hạn ngạch hôm nay',
+  statusPlaying: 'Đang chơi: {names}',
+  statusIdle: 'Đang rảnh rỗi - Sẵn sàng học tập/giải trí',
+  minutesToday: 'phút hôm nay',
+  statPlayed: 'Đã chơi',
+  statRemaining: 'Còn lại',
+  statSessions: 'Số phiên chơi',
+  statFocus: 'Giờ Focus',
+  focusActive: 'Đang diễn ra',
+  focusNone: 'Không có',
+  historyTitle: 'Lịch sử phiên chơi hôm nay',
+  historyEmpty: 'Hôm nay chưa có phiên chơi.',
+  historyGame: 'Game',
+  historyStart: 'Bắt đầu',
+  historyDuration: 'Thời lượng',
+
+  // Danh sách game
+  gamesSubtitle: 'Game được bật theo dõi sẽ bị tính giờ và tự tắt khi vi phạm.',
+  gamesLocked: 'Không thể tắt theo dõi hoặc xóa game lúc này.',
+  gamesAddTitle: 'Thêm game',
+  gamesScan: 'Quét ứng dụng đang mở',
+  gamesDisplayName: 'Tên hiển thị',
+  gamesExePlaceholder: 'ten-game.exe',
+  gamesExeLabel: 'Tên file exe',
+  gamesAdd: 'Thêm',
+  gamesScanWarning:
+    'Ứng dụng được thêm sẽ bị buộc tắt khi đang trong giờ Focus hoặc hết giờ chơi, dữ liệu chưa lưu sẽ mất.',
+  gamesNoWindows: 'Không tìm thấy cửa sổ nào đang mở.',
+  gamesAlreadyAdded: 'Đã có',
+  gamesDuplicate: '{exe} đã có trong danh sách.',
+  gamesListTitle: 'Game đang kiểm soát ({count})',
+  gamesEmpty: 'Chưa có game nào.',
+  gamesTrack: 'Theo dõi {name}',
+
+  // Giới hạn & Focus
+  scheduleTitle: 'Giới hạn & Khung giờ Focus',
+  scheduleSubtitle: 'Đặt số phút chơi mỗi ngày và các khung giờ không được mở game.',
+  scheduleLocked:
+    'Không thể đổi khởi động cùng Windows, tăng giới hạn phút, tắt, xóa hoặc bớt ngày của khung giờ Focus lúc này.',
+  autoStartTitle: 'Khởi động cùng Windows',
+  autoStartHint: 'Tự chạy ngầm dưới khay hệ thống khi bật máy.',
+  limitsTitle: 'Giới hạn mỗi ngày',
+  limitWeekday: 'Giới hạn Ngày thường (Thứ 2 - Thứ 6)',
+  limitWeekend: 'Giới hạn Cuối tuần (Thứ 7 - CN)',
+  minutesUnit: 'phút',
+  minutesAria: '{label} (phút)',
+  limitsSave: 'Lưu cấu hình',
+  limitsIncreaseBlocked: 'Đang khóa: chỉ được giảm giới hạn, không được tăng.',
+  focusTitle: 'Khung giờ Focus ({count})',
+  focusEmpty: 'Chưa có khung giờ nào.',
+  focusNextDay: ' (hôm sau)',
+  focusEnable: 'Bật {name}',
+  focusLabelPlaceholder: 'Nhãn, ví dụ: Giờ học buổi tối',
+  focusLabelAria: 'Nhãn khung giờ',
+  focusStart: 'Giờ bắt đầu',
+  focusEnd: 'Giờ kết thúc',
+  focusAdd: 'Thêm khung giờ',
+  dayMon: 'T2',
+  dayTue: 'T3',
+  dayWed: 'T4',
+  dayThu: 'T5',
+  dayFri: 'T6',
+  daySat: 'T7',
+  daySun: 'CN',
+
+  // Cài đặt
+  settingsSubtitle: 'Chọn ngôn ngữ và tùy biến nền của ứng dụng.',
+  themeTitle: 'Giao diện',
+  themeDark: 'Tối',
+  themeLight: 'Sáng',
+  colorTitle: 'Màu nền',
+  colorHint: 'Chọn màu có sẵn hoặc tự chọn bằng bảng màu.',
+  colorCustom: 'Chọn màu khác',
+  colorReset: 'Mặc định',
+  imageTitle: 'Ảnh nền',
+  imageHint: 'Ảnh PNG, JPG hoặc WebP, tối đa 10 MB. Ảnh nền được ưu tiên hơn màu nền.',
+  imageChoose: 'Chọn ảnh',
+  imageRemove: 'Xóa ảnh',
+  imagePreview: 'Ảnh nền hiện tại',
+  imageDialogTitle: 'Chọn ảnh nền',
+  imageFilter: 'Ảnh',
+  imageTooLarge: 'Ảnh quá lớn, hãy chọn ảnh dưới 10 MB.',
+
+  // Mở khóa khẩn cấp
+  unlockInstruction:
+    'Gõ lại chính xác câu dưới đây, gồm cả dấu câu và chữ hoa/thường. Không thể dán văn bản.',
+  unlockInputAria: 'Gõ lại câu cam kết',
+  unlockMismatch: 'Câu cam kết không khớp, hãy thử lại.',
+  unlockProgress: 'Đúng {correct}/{total} ký tự',
+  unlockClose: 'Đóng',
+  unlockCancel: 'Hủy',
+  unlockConfirm: 'Xác nhận Mở khóa (5 phút)',
+  commitmentPhrase:
+    'Tôi xác nhận đang tự phá vỡ kỷ luật của bản thân và việc mở khóa lúc này sẽ làm ảnh hưởng trực tiếp đến mục tiêu học tập cũng như công việc của tôi.',
+
+  // Khay hệ thống
+  trayTooltip: 'PlayCurfew - Đang bảo vệ giờ học của bạn',
+  trayFocus: '🔴 Đang khóa (Giờ Focus)',
+  trayOutOfTime: '🔴 Đang khóa (Hết giờ)',
+  trayPlaying: '🟡 Đang chơi - Còn lại: {minutes} phút',
+  trayRemaining: '🟢 Còn lại: {minutes} phút',
+  trayOpen: 'Mở bảng điều khiển',
+  trayQuit: 'Thoát PlayCurfew',
+  trayQuitLocked: '🔒 Thoát PlayCurfew (Đang khóa - Mở app để Unlock)',
+
+  // Thông báo và lỗi từ main
+  noticeTray: 'PlayCurfew vẫn đang chạy ngầm dưới khay hệ thống.',
+  noticeFocusTitle: 'Đang trong giờ Focus',
+  noticeFocusBody: 'Đã tắt {names}. Quay lại việc học nhé!',
+  noticeOutOfTimeTitle: 'Đã hết giờ chơi hôm nay',
+  noticeOutOfTimeBody: 'Đã tắt {names}.',
+  noticeWarningTitle: 'Sắp hết giờ chơi',
+  noticeWarningBody: 'Còn khoảng {minutes} phút chơi hôm nay.',
+  errorInvalidExe: 'Tên file không hợp lệ: {exe}',
+  errorGameNotFound: 'Không tìm thấy game: {id}',
+  errorScheduleNotFound: 'Không tìm thấy khung giờ: {id}',
+  errorAutoStartOn: 'Không bật được khởi động cùng Windows: cần chạy ứng dụng với quyền Admin.',
+  errorAutoStartOff: 'Không tắt được khởi động cùng Windows: cần chạy ứng dụng với quyền Admin.'
+}
+
+export type MessageKey = keyof typeof vi
+
+const en: Record<MessageKey, string> = {
+  tagline: 'Keep play in check',
+  tabDashboard: 'Overview',
+  tabGames: 'Game list',
+  tabSchedule: 'Limits & Focus',
+  tabSettings: 'Settings',
+  languageLabel: 'Language',
+  settingsLocked: 'Settings locked',
+  settingsOpen: 'Settings unlocked',
+  tempUnlock: 'Temporarily unlocked',
+  emergencyUnlock: 'Emergency unlock',
+  lockHint: 'Click "Emergency unlock" in the sidebar to unlock for 5 minutes.',
+  toggleLockedTitle: 'Locked: use "Emergency unlock" to change this',
+  deleteLockedTitle: 'Locked: use "Emergency unlock" to delete this',
+  deleteItem: 'Delete {name}',
+
+  durationHours: '{hours} h {minutes} min',
+  durationMinutesSeconds: '{minutes} min {seconds} s',
+  durationMinutes: '{minutes} min',
+  durationSeconds: '{seconds} s',
+
+  statusFocus: 'Locked: Focus study time',
+  statusOutOfTime: "Today's quota is used up",
+  statusPlaying: 'Playing: {names}',
+  statusIdle: 'Idle - Ready for study or play',
+  minutesToday: 'minutes today',
+  statPlayed: 'Played',
+  statRemaining: 'Remaining',
+  statSessions: 'Sessions',
+  statFocus: 'Focus time',
+  focusActive: 'In progress',
+  focusNone: 'None',
+  historyTitle: "Today's play sessions",
+  historyEmpty: 'No play sessions yet today.',
+  historyGame: 'Game',
+  historyStart: 'Started',
+  historyDuration: 'Duration',
+
+  gamesSubtitle: 'Tracked games count toward your time and are closed when they break the rules.',
+  gamesLocked: 'Tracking cannot be turned off and games cannot be deleted right now.',
+  gamesAddTitle: 'Add a game',
+  gamesScan: 'Scan open apps',
+  gamesDisplayName: 'Display name',
+  gamesExePlaceholder: 'game-name.exe',
+  gamesExeLabel: 'Exe file name',
+  gamesAdd: 'Add',
+  gamesScanWarning:
+    'Added apps are force-closed during Focus time or when play time runs out, and unsaved data is lost.',
+  gamesNoWindows: 'No open windows found.',
+  gamesAlreadyAdded: 'Added',
+  gamesDuplicate: '{exe} is already in the list.',
+  gamesListTitle: 'Controlled games ({count})',
+  gamesEmpty: 'No games yet.',
+  gamesTrack: 'Track {name}',
+
+  scheduleTitle: 'Limits & Focus schedules',
+  scheduleSubtitle: 'Set your daily minutes and the times when games cannot be opened.',
+  scheduleLocked:
+    'Start with Windows, raising the limit, and turning off, deleting, or shortening Focus schedules are unavailable right now.',
+  autoStartTitle: 'Start with Windows',
+  autoStartHint: 'Runs in the system tray when you sign in.',
+  limitsTitle: 'Daily limits',
+  limitWeekday: 'Weekday limit (Mon - Fri)',
+  limitWeekend: 'Weekend limit (Sat - Sun)',
+  minutesUnit: 'min',
+  minutesAria: '{label} (minutes)',
+  limitsSave: 'Save settings',
+  limitsIncreaseBlocked: 'Locked: limits can only be lowered, not raised.',
+  focusTitle: 'Focus schedules ({count})',
+  focusEmpty: 'No schedules yet.',
+  focusNextDay: ' (next day)',
+  focusEnable: 'Turn on {name}',
+  focusLabelPlaceholder: 'Label, for example: Evening study',
+  focusLabelAria: 'Schedule label',
+  focusStart: 'Start time',
+  focusEnd: 'End time',
+  focusAdd: 'Add schedule',
+  dayMon: 'Mo',
+  dayTue: 'Tu',
+  dayWed: 'We',
+  dayThu: 'Th',
+  dayFri: 'Fr',
+  daySat: 'Sa',
+  daySun: 'Su',
+
+  settingsSubtitle: 'Choose a language and customize the app background.',
+  themeTitle: 'Theme',
+  themeDark: 'Dark',
+  themeLight: 'Light',
+  colorTitle: 'Background color',
+  colorHint: 'Pick a preset or choose any color.',
+  colorCustom: 'Choose another color',
+  colorReset: 'Default',
+  imageTitle: 'Background image',
+  imageHint: 'PNG, JPG, or WebP, up to 10 MB. The image takes priority over the color.',
+  imageChoose: 'Choose image',
+  imageRemove: 'Remove image',
+  imagePreview: 'Current background image',
+  imageDialogTitle: 'Choose a background image',
+  imageFilter: 'Images',
+  imageTooLarge: 'This image is too large. Choose one under 10 MB.',
+
+  unlockInstruction:
+    'Retype the sentence below exactly, including punctuation and capitalization. Pasting is disabled.',
+  unlockInputAria: 'Retype the commitment sentence',
+  unlockMismatch: 'The sentence does not match. Try again.',
+  unlockProgress: '{correct}/{total} characters correct',
+  unlockClose: 'Close',
+  unlockCancel: 'Cancel',
+  unlockConfirm: 'Confirm unlock (5 minutes)',
+  commitmentPhrase:
+    'I confirm that I am breaking my own discipline, and unlocking now will directly harm my study and work goals.',
+
+  trayTooltip: 'PlayCurfew - Protecting your study time',
+  trayFocus: '🔴 Locked (Focus time)',
+  trayOutOfTime: '🔴 Locked (Out of time)',
+  trayPlaying: '🟡 Playing - {minutes} min left',
+  trayRemaining: '🟢 {minutes} min left',
+  trayOpen: 'Open dashboard',
+  trayQuit: 'Quit PlayCurfew',
+  trayQuitLocked: '🔒 Quit PlayCurfew (Locked - open the app to unlock)',
+
+  noticeTray: 'PlayCurfew is still running in the system tray.',
+  noticeFocusTitle: 'Focus time',
+  noticeFocusBody: 'Closed {names}. Back to studying!',
+  noticeOutOfTimeTitle: "Today's play time is up",
+  noticeOutOfTimeBody: 'Closed {names}.',
+  noticeWarningTitle: 'Play time is almost up',
+  noticeWarningBody: 'About {minutes} minutes of play left today.',
+  errorInvalidExe: 'Invalid file name: {exe}',
+  errorGameNotFound: 'Game not found: {id}',
+  errorScheduleNotFound: 'Schedule not found: {id}',
+  errorAutoStartOn: 'Could not turn on Start with Windows: the app needs Administrator rights.',
+  errorAutoStartOff: 'Could not turn off Start with Windows: the app needs Administrator rights.'
+}
+
+const MESSAGES: Record<Language, Record<MessageKey, string>> = { vi, en }
+
+export type MessageParams = Record<string, string | number>
+
+export function translate(language: Language, key: MessageKey, params?: MessageParams): string {
+  return MESSAGES[language][key].replace(/\{(\w+)\}/g, (_, name) => String(params?.[name] ?? ''))
+}
+
+/** Câu mặc định đi theo ngôn ngữ, còn câu người dùng tự đặt thì giữ nguyên. */
+export function getCommitmentPhrase(config: AppConfig): string {
+  return config.commitmentPhrase === vi.commitmentPhrase
+    ? translate(config.language, 'commitmentPhrase')
+    : config.commitmentPhrase
+}

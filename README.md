@@ -18,9 +18,7 @@
   <a href="https://github.com/anphuctran2005/playcurfew/releases/latest/download/PlayCurfew-Setup.exe"><img src="https://img.shields.io/badge/Download%20for%20Windows-PlayCurfew--Setup.exe-2563eb?style=for-the-badge" alt="Download for Windows" /></a>
 </p>
 
-![PlayCurfew dashboard](docs/images/01-tong-quan.png)
-
-> The app interface is currently in Vietnamese only. The guide below shows the Vietnamese label in bold, followed by its English meaning.
+![PlayCurfew dashboard](docs/images/en/01-overview.png)
 
 ## Features
 
@@ -33,6 +31,8 @@
 - **History:** see today's play sessions with start times and durations.
 - **Background mode:** closing the window only minimizes the app to the system tray, and tracking continues. The Quit option is disabled while settings are locked.
 - **Start with Windows:** runs in the system tray when you sign in.
+- **Two languages:** switch between English and Vietnamese at any time, including tray menus and notifications.
+- **Custom background:** choose a light or dark theme, any background color, or your own image.
 
 ## Requirements
 
@@ -81,12 +81,12 @@ The screenshots below were taken from the real app with sample data.
 
 ### Step 1: Add the games to control
 
-Open the **Danh sách game** (Game list) tab. There are two ways to add a game:
+Open the **Game list** tab. There are two ways to add a game:
 
-- **Manually:** enter a display name and the file name, such as `masterduel.exe`, then click **Thêm** (Add).
-- **Scan open apps:** open the game first, click **Quét ứng dụng đang mở** (Scan open apps), pick the game's window from the list, edit the display name if needed, then click **Thêm** (Add).
+- **Manually:** enter a display name and the file name, such as `masterduel.exe`, then click **Add**.
+- **Scan open apps:** open the game first, click **Scan open apps**, pick the game's window from the list, edit the display name if needed, then click **Add**.
 
-![Adding a game to the list](docs/images/02-them-game.png)
+![Adding a game to the list](docs/images/en/02-add-game.png)
 
 Use the switch to turn tracking on or off for each game.
 
@@ -94,18 +94,18 @@ Use the switch to turn tracking on or off for each game.
 
 ### Step 2: Set limits and Focus schedules
 
-Open the **Giới hạn & Focus** (Limits & Focus) tab.
+Open the **Limits & Focus** tab.
 
-- **Daily limits:** drag the slider or enter the minutes, then click **Lưu cấu hình** (Save settings).
-- **Focus schedules:** enter a label, a start and end time in 24-hour format (such as `19:30`), choose the days of the week, then click **Thêm khung giờ** (Add schedule). An end time earlier than the start time means the schedule ends the next day.
+- **Daily limits:** drag the slider or enter the minutes, then click **Save settings**.
+- **Focus schedules:** enter a label, a start and end time in 24-hour format (such as `19:30`), choose the days of the week, then click **Add schedule**. An end time earlier than the start time means the schedule ends the next day.
 
-![Setting limits and Focus schedules](docs/images/03-gioi-han-focus.png)
+![Setting limits and Focus schedules](docs/images/en/03-limits-focus.png)
 
 Existing schedules can be turned on or off, have days added or removed, and be deleted. To change the times, delete the schedule and create a new one.
 
 ### Step 3: Follow your day on the dashboard
 
-The ring on the **Tổng quan** (Overview) tab shows minutes played against today's limit:
+The ring on the **Overview** tab shows minutes played against today's limit:
 
 | Color | Meaning |
 | --- | --- |
@@ -115,23 +115,41 @@ The ring on the **Tổng quan** (Overview) tab shows minutes played against toda
 
 When you open a listed game, the status bar turns yellow and play time starts counting:
 
-![The dashboard while playing a game](docs/images/04-dang-choi.png)
+![The dashboard while playing a game](docs/images/en/04-playing.png)
 
 During Focus hours, the status bar and ring turn red, and open games are closed:
 
-![The dashboard during Focus hours](docs/images/08-gio-focus.png)
+![The dashboard during Focus hours](docs/images/en/08-focus-time.png)
 
 ### Background mode and the system tray
 
 Closing the window only minimizes the app to the system tray, next to the clock. Click the icon to open it again, or right-click to see the minutes left or quit the app.
 
-Turn on **Khởi động cùng Windows** (Start with Windows) at the top of the **Giới hạn & Focus** tab to run the app in the background each time you sign in. This creates a `PlayCurfewAutoStart` task in Task Scheduler.
+Turn on **Start with Windows** at the top of the **Limits & Focus** tab to run the app in the background each time you sign in. This creates a `PlayCurfewAutoStart` task in Task Scheduler.
+
+### Language and appearance
+
+Use the **VI / EN** switch in the sidebar to change the language at any time. Tray menus, notifications, and the commitment sentence change with it.
+
+Open the **Settings** tab to customize the app:
+
+- **Theme:** choose **Dark** or **Light**.
+- **Background color:** pick a preset or click **Choose another color** to use any color. **Default** returns to the theme's color.
+- **Background image:** click **Choose image** and select a PNG, JPG, or WebP file up to 10 MB. The image takes priority over the color.
+
+![The Settings tab](docs/images/en/09-settings.png)
+
+| Light theme | Background image |
+| --- | --- |
+| ![The light theme](docs/images/en/10-light-theme.png) | ![A custom background image](docs/images/en/11-background-image.png) |
+
+These settings are never locked.
 
 ### How the lock works
 
 Settings lock automatically in any of three cases: during Focus hours, when today's play time has run out, or while a tracked game is running. Locked actions show a padlock icon.
 
-![The game list while locked](docs/images/05-dang-khoa.png)
+![The game list while locked](docs/images/en/05-locked.png)
 
 | Action | While locked |
 | --- | --- |
@@ -146,15 +164,15 @@ Settings lock automatically in any of three cases: during Focus hours, when toda
 
 ### Emergency unlock
 
-1. Click **Mở khóa khẩn cấp** (Emergency unlock) in the sidebar. This button only appears while locked.
-2. Retype the commitment sentence exactly, including punctuation and capitalization. The sentence is in Vietnamese and pasting is blocked. Correct characters turn green, and wrong ones get a red background.
-3. Once the sentence matches completely, the **Xác nhận Mở khóa (5 phút)** (Confirm unlock, 5 minutes) button lights up. Click it.
+1. Click **Emergency unlock** in the sidebar. This button only appears while locked.
+2. Retype the commitment sentence exactly, including punctuation and capitalization. Pasting is blocked. Correct characters turn green, and wrong ones get a red background.
+3. Once the sentence matches completely, the **Confirm unlock (5 minutes)** button lights up. Click it.
 
-![Retyping the commitment sentence to unlock](docs/images/06-mo-khoa-khan-cap.png)
+![Retyping the commitment sentence to unlock](docs/images/en/06-emergency-unlock.png)
 
 The sidebar shows a countdown, and settings lock again after 5 minutes. Unlocking only lets you change settings and quit the app: games are still closed during Focus hours or once your time runs out.
 
-![The countdown during a temporary unlock](docs/images/07-mo-khoa-tam-thoi.png)
+![The countdown during a temporary unlock](docs/images/en/07-temp-unlock.png)
 
 ## Your data
 
@@ -165,7 +183,6 @@ All data stays on your computer at `%APPDATA%\playcurfew\config.json` and is nev
 - **Task Manager can still end the app.** The Quit lock only covers quitting from within the app. Ending the process in Task Manager stops tracking.
 - **Editing the config is not blocked.** Editing `config.json` directly still changes settings. PlayCurfew is a discipline aid, not a tamper-proof control.
 - **Uninstalling:** the `PlayCurfewAutoStart` task is not removed automatically. Turn off **Start with Windows** before uninstalling.
-- **Language:** the app interface is in Vietnamese only.
 
 ## For developers
 

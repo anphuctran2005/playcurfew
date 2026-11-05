@@ -1,7 +1,9 @@
 import { useEffect, useState } from 'react'
 import { Lock, Plus, Save, Trash2 } from 'lucide-react'
 import type { AppConfig, FocusSchedule } from '../../../shared/types'
+import type { MessageKey } from '../../../shared/i18n'
 import { errorMessage } from '../lib/format'
+import { useT } from '../lib/i18n'
 import LockNotice from './LockNotice'
 import Toggle from './Toggle'
 import { Card, PageHeader } from './ui'
@@ -11,14 +13,14 @@ const SLIDER_MAX_MINUTES = 720
 const SLIDER_STEP_MINUTES = 5
 
 // Hiển thị từ T2 đến CN, giá trị theo Date.getDay() (0 là Chủ nhật).
-const WEEK_DAYS = [
-  { value: 1, label: 'T2' },
-  { value: 2, label: 'T3' },
-  { value: 3, label: 'T4' },
-  { value: 4, label: 'T5' },
-  { value: 5, label: 'T6' },
-  { value: 6, label: 'T7' },
-  { value: 0, label: 'CN' }
+const WEEK_DAYS: { value: number; labelKey: MessageKey }[] = [
+  { value: 1, labelKey: 'dayMon' },
+  { value: 2, labelKey: 'dayTue' },
+  { value: 3, labelKey: 'dayWed' },
+  { value: 4, labelKey: 'dayThu' },
+  { value: 5, labelKey: 'dayFri' },
+  { value: 6, labelKey: 'daySat' },
+  { value: 0, labelKey: 'daySun' }
 ]
 
 interface QuotaFieldProps {
@@ -28,6 +30,7 @@ interface QuotaFieldProps {
 }
 
 function QuotaField({ label, value, onChange }: QuotaFieldProps): React.JSX.Element {
+  const t = useT()
   const setClamped = (raw: string): void => {
     onChange(Math.min(Math.max(Math.floor(Number(raw)) || 0, 0), MAX_LIMIT_MINUTES))
   }
@@ -52,10 +55,10 @@ function QuotaField({ label, value, onChange }: QuotaFieldProps): React.JSX.Elem
           max={MAX_LIMIT_MINUTES}
           value={value}
           onChange={(e) => setClamped(e.target.value)}
-          aria-label={`${label} (phút)`}
+          aria-label={t('minutesAria', { label })}
           className="field w-20 text-right"
         />
-        <span className="text-sm text-slate-400">phút</span>
+        <span className="text-sm text-slate-400">{t('minutesUnit')}</span>
       </div>
     </div>
   )
@@ -68,9 +71,11 @@ interface DayPickerProps {
 }
 
 function DayPicker({ days, isDayDisabled, onToggle }: DayPickerProps): React.JSX.Element {
+  const t = useT()
+
   return (
     <div className="flex shrink-0 gap-1">
-      {WEEK_DAYS.map(({ value, label }) => {
+      {WEEK_DAYS.map(({ value, labelKey }) => {
         const isSelected = days.includes(value)
         return (
           <button
@@ -85,7 +90,7 @@ function DayPicker({ days, isDayDisabled, onToggle }: DayPickerProps): React.JSX
                 : 'bg-slate-700 text-slate-300 not-disabled:hover:bg-slate-600'
             }`}
           >
-            {label}
+            {t(labelKey)}
           </button>
         )
       })}
@@ -115,6 +120,7 @@ function ScheduleTab({
   onConfigChange,
   onChanged
 }: ScheduleTabProps): React.JSX.Element {
+  const t = useT()
   const [weekdayLimit, setWeekdayLimit] = useState(config.weekdayLimitMinutes)
   const [weekendLimit, setWeekendLimit] = useState(config.weekendLimitMinutes)
   const [schedules, setSchedules] = useState<FocusSchedule[]>([])
@@ -194,27 +200,19 @@ function ScheduleTab({
 
   return (
     <div className="mx-auto flex max-w-4xl flex-col gap-4">
-      <PageHeader
-        title="Giới hạn & Khung giờ Focus"
-        subtitle="Đặt số phút chơi mỗi ngày và các khung giờ không được mở game."
-      />
+      <PageHeader title={t('scheduleTitle')} subtitle={t('scheduleSubtitle')} />
 
-      {isLocked && (
-        <LockNotice>
-          Không thể đổi khởi động cùng Windows, tăng giới hạn phút, tắt, xóa hoặc bớt ngày của khung
-          giờ Focus lúc này.
-        </LockNotice>
-      )}
-      {error && <p className="text-sm text-red-400">{error}</p>}
+      {isLocked && <LockNotice>{t('scheduleLocked')}</LockNotice>}
+      {error && <p className="page-error">{error}</p>}
 
       <section className="flex items-center justify-between gap-4 rounded-xl border border-slate-700 bg-slate-800 px-4 py-3">
         <div>
-          <h3 className="text-sm font-semibold">Khởi động cùng Windows</h3>
-          <p className="text-xs text-slate-400">Tự chạy ngầm dưới khay hệ thống khi bật máy.</p>
+          <h3 className="text-sm font-semibold">{t('autoStartTitle')}</h3>
+          <p className="text-xs text-slate-400">{t('autoStartHint')}</p>
         </div>
         <Toggle
           checked={config.launchAtStartup}
-          label="Khởi động cùng Windows"
+          label={t('autoStartTitle')}
           isLocked={isLocked}
           lockBothWays
           onChange={setLaunchAtStartup}
@@ -222,13 +220,11 @@ function ScheduleTab({
       </section>
 
       <Card
-        title="Giới hạn mỗi ngày"
+        title={t('limitsTitle')}
         action={
           <div className="flex items-center gap-3">
             {isIncreaseBlocked && (
-              <span className="text-xs text-red-300">
-                Đang khóa: chỉ được giảm giới hạn, không được tăng.
-              </span>
+              <span className="text-xs text-red-300">{t('limitsIncreaseBlocked')}</span>
             )}
             <button
               type="button"
@@ -237,28 +233,20 @@ function ScheduleTab({
               className="btn btn-primary"
             >
               {isIncreaseBlocked ? <Lock className="size-4" /> : <Save className="size-4" />}
-              Lưu cấu hình
+              {t('limitsSave')}
             </button>
           </div>
         }
       >
         <div className="grid grid-cols-2 gap-6 p-4">
-          <QuotaField
-            label="Giới hạn Ngày thường (Thứ 2 - Thứ 6)"
-            value={weekdayLimit}
-            onChange={setWeekdayLimit}
-          />
-          <QuotaField
-            label="Giới hạn Cuối tuần (Thứ 7 - CN)"
-            value={weekendLimit}
-            onChange={setWeekendLimit}
-          />
+          <QuotaField label={t('limitWeekday')} value={weekdayLimit} onChange={setWeekdayLimit} />
+          <QuotaField label={t('limitWeekend')} value={weekendLimit} onChange={setWeekendLimit} />
         </div>
       </Card>
 
-      <Card title={`Khung giờ Focus (${schedules.length})`}>
+      <Card title={t('focusTitle', { count: schedules.length })}>
         {schedules.length === 0 ? (
-          <p className="px-4 py-6 text-center text-sm text-slate-400">Chưa có khung giờ nào.</p>
+          <p className="px-4 py-6 text-center text-sm text-slate-400">{t('focusEmpty')}</p>
         ) : (
           <ul className="divide-y divide-slate-700">
             {schedules.map((schedule) => (
@@ -267,7 +255,7 @@ function ScheduleTab({
                   <p className="truncate text-sm font-medium">{schedule.label}</p>
                   <p className="text-xs text-slate-400 tabular-nums">
                     {schedule.startTime} - {schedule.endTime}
-                    {schedule.endTime < schedule.startTime && ' (hôm sau)'}
+                    {schedule.endTime < schedule.startTime && t('focusNextDay')}
                   </p>
                 </div>
                 <DayPicker
@@ -286,7 +274,7 @@ function ScheduleTab({
                 />
                 <Toggle
                   checked={schedule.isEnabled}
-                  label={`Bật ${schedule.label}`}
+                  label={t('focusEnable', { name: schedule.label })}
                   isLocked={isLocked}
                   onChange={(isEnabled) =>
                     run(() => window.api.updateFocusSchedule(schedule.id, { isEnabled }))
@@ -295,8 +283,8 @@ function ScheduleTab({
                 <button
                   type="button"
                   disabled={isLocked}
-                  aria-label={`Xóa ${schedule.label}`}
-                  title={isLocked ? 'Đang khóa: dùng "Mở khóa khẩn cấp" để xóa' : undefined}
+                  aria-label={t('deleteItem', { name: schedule.label })}
+                  title={isLocked ? t('deleteLockedTitle') : undefined}
                   onClick={() => run(() => window.api.removeFocusSchedule(schedule.id))}
                   className="btn-delete"
                 >
@@ -312,8 +300,8 @@ function ScheduleTab({
             <input
               value={label}
               onChange={(e) => setLabel(e.target.value)}
-              placeholder="Nhãn, ví dụ: Giờ học buổi tối"
-              aria-label="Nhãn khung giờ"
+              placeholder={t('focusLabelPlaceholder')}
+              aria-label={t('focusLabelAria')}
               className="field min-w-0 flex-1"
             />
             <input
@@ -321,7 +309,7 @@ function ScheduleTab({
               onChange={(e) => setStartTime(e.target.value)}
               placeholder="19:30"
               maxLength={5}
-              aria-label="Giờ bắt đầu"
+              aria-label={t('focusStart')}
               aria-invalid={!isValidTime(startTime)}
               className="field w-20 text-center tabular-nums aria-invalid:border-red-500"
             />
@@ -331,7 +319,7 @@ function ScheduleTab({
               onChange={(e) => setEndTime(e.target.value)}
               placeholder="22:00"
               maxLength={5}
-              aria-label="Giờ kết thúc"
+              aria-label={t('focusEnd')}
               aria-invalid={!isValidTime(endTime)}
               className="field w-20 text-center tabular-nums aria-invalid:border-red-500"
             />
@@ -340,7 +328,7 @@ function ScheduleTab({
             <DayPicker days={days} onToggle={(day) => setDays(toggleDay(days, day))} />
             <button type="submit" disabled={!canAdd} className="btn btn-primary">
               <Plus className="size-4" />
-              Thêm khung giờ
+              {t('focusAdd')}
             </button>
           </div>
         </form>

@@ -1,6 +1,8 @@
+import { useContext } from 'react'
 import { CircleCheck, Gamepad2, Lock, type LucideIcon } from 'lucide-react'
 import type { DashboardState } from '../../../shared/types'
 import { formatDuration, formatTime } from '../lib/format'
+import { getLocale, LanguageContext, useT, type Translate } from '../lib/i18n'
 import { Card, PageHeader } from './ui'
 
 const RING_RADIUS = 100
@@ -32,27 +34,23 @@ function getRingColor(dashboard: DashboardState, ratio: number): keyof typeof RI
   return 'green'
 }
 
-function getBadge(dashboard: DashboardState): Badge {
+function getBadge(dashboard: DashboardState, t: Translate): Badge {
   if (dashboard.isFocusActive) {
-    return { color: 'red', icon: Lock, text: 'Đang khóa: Giờ tập trung học tập' }
+    return { color: 'red', icon: Lock, text: t('statusFocus') }
   }
   if (dashboard.remainingSeconds <= 0) {
-    return { color: 'red', icon: Lock, text: 'Đã hết hạn ngạch hôm nay' }
+    return { color: 'red', icon: Lock, text: t('statusOutOfTime') }
   }
   if (dashboard.runningGames.length > 0) {
     const names = dashboard.runningGames.map((game) => game.name).join(', ')
-    return { color: 'yellow', icon: Gamepad2, text: `Đang chơi: ${names}` }
+    return { color: 'yellow', icon: Gamepad2, text: t('statusPlaying', { names }) }
   }
-  return {
-    color: 'green',
-    icon: CircleCheck,
-    text: 'Đang rảnh rỗi - Sẵn sàng học tập/giải trí'
-  }
+  return { color: 'green', icon: CircleCheck, text: t('statusIdle') }
 }
 
-function formatDate(date: string): string {
+function formatDate(date: string, locale: string): string {
   // Thêm giờ để được hiểu theo giờ máy: chuỗi chỉ có ngày sẽ bị coi là UTC.
-  return new Date(`${date}T00:00:00`).toLocaleDateString('vi-VN', {
+  return new Date(`${date}T00:00:00`).toLocaleDateString(locale, {
     weekday: 'long',
     day: 'numeric',
     month: 'long',
@@ -70,22 +68,26 @@ function Stat({ label, value }: { label: string; value: string }): React.JSX.Ele
 }
 
 function DashboardTab({ dashboard }: { dashboard: DashboardState }): React.JSX.Element {
+  const t = useT()
+  const locale = getLocale(useContext(LanguageContext))
   const { date, usedSeconds, limitSeconds, remainingSeconds, isFocusActive, sessions } = dashboard
   const ratio = limitSeconds > 0 ? Math.min(usedSeconds / limitSeconds, 1) : 1
-  const badge = getBadge(dashboard)
+  const badge = getBadge(dashboard, t)
   const BadgeIcon = badge.icon
 
   return (
     <div className="mx-auto flex max-w-4xl flex-col gap-4">
-      <PageHeader title="Tổng quan" subtitle={formatDate(date)} />
+      <PageHeader title={t('tabDashboard')} subtitle={formatDate(date, locale)} />
 
-      <p
-        role="status"
-        className={`flex items-center gap-2 rounded-lg border px-4 py-2.5 text-sm font-medium ${BADGE_COLORS[badge.color]}`}
-      >
-        <BadgeIcon className="size-4 shrink-0" />
-        <span className="min-w-0 truncate">{badge.text}</span>
-      </p>
+      <div className="rounded-lg bg-slate-800">
+        <p
+          role="status"
+          className={`flex items-center gap-2 rounded-lg border px-4 py-2.5 text-sm font-medium ${BADGE_COLORS[badge.color]}`}
+        >
+          <BadgeIcon className="size-4 shrink-0" />
+          <span className="min-w-0 truncate">{badge.text}</span>
+        </p>
+      </div>
 
       <div className="grid grid-cols-[auto_1fr] gap-4">
         <div className="rounded-xl border border-slate-700 bg-slate-800 p-4">
@@ -118,40 +120,40 @@ function DashboardTab({ dashboard }: { dashboard: DashboardState }): React.JSX.E
                 {Math.floor(usedSeconds / 60)}
                 <span className="text-lg text-slate-400"> / {limitSeconds / 60}</span>
               </p>
-              <p className="text-xs text-slate-400">phút hôm nay</p>
+              <p className="text-xs text-slate-400">{t('minutesToday')}</p>
             </div>
           </div>
         </div>
 
         <div className="grid grid-cols-2 gap-4">
-          <Stat label="Đã chơi" value={formatDuration(usedSeconds)} />
-          <Stat label="Còn lại" value={formatDuration(remainingSeconds)} />
-          <Stat label="Số phiên chơi" value={String(sessions.length)} />
-          <Stat label="Giờ Focus" value={isFocusActive ? 'Đang diễn ra' : 'Không có'} />
+          <Stat label={t('statPlayed')} value={formatDuration(usedSeconds, t)} />
+          <Stat label={t('statRemaining')} value={formatDuration(remainingSeconds, t)} />
+          <Stat label={t('statSessions')} value={String(sessions.length)} />
+          <Stat label={t('statFocus')} value={isFocusActive ? t('focusActive') : t('focusNone')} />
         </div>
       </div>
 
-      <Card title="Lịch sử phiên chơi hôm nay">
+      <Card title={t('historyTitle')}>
         {sessions.length === 0 ? (
-          <p className="px-4 py-6 text-center text-sm text-slate-400">
-            Hôm nay chưa có phiên chơi.
-          </p>
+          <p className="px-4 py-6 text-center text-sm text-slate-400">{t('historyEmpty')}</p>
         ) : (
           <table className="w-full text-left text-sm">
             <thead className="text-slate-400">
               <tr>
-                <th className="px-4 py-2 font-medium">Game</th>
-                <th className="px-4 py-2 font-medium">Bắt đầu</th>
-                <th className="px-4 py-2 font-medium">Thời lượng</th>
+                <th className="px-4 py-2 font-medium">{t('historyGame')}</th>
+                <th className="px-4 py-2 font-medium">{t('historyStart')}</th>
+                <th className="px-4 py-2 font-medium">{t('historyDuration')}</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-700">
               {[...sessions].reverse().map((session) => (
                 <tr key={session.startTime}>
                   <td className="px-4 py-2">{session.gameName}</td>
-                  <td className="px-4 py-2 tabular-nums">{formatTime(session.startTime)}</td>
                   <td className="px-4 py-2 tabular-nums">
-                    {formatDuration(session.durationSeconds)}
+                    {formatTime(session.startTime, locale)}
+                  </td>
+                  <td className="px-4 py-2 tabular-nums">
+                    {formatDuration(session.durationSeconds, t)}
                   </td>
                 </tr>
               ))}

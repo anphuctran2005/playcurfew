@@ -3,6 +3,7 @@ import { rm, writeFile } from 'fs/promises'
 import { join } from 'path'
 import { promisify } from 'util'
 import { app } from 'electron'
+import { translateMain } from './store'
 
 export const HIDDEN_FLAG = '--hidden'
 
@@ -78,9 +79,7 @@ export async function enableAdminAutoStart(): Promise<void> {
     await schtasks(['/Create', '/TN', TASK_NAME, '/XML', xmlPath, '/F'])
   } catch (error) {
     console.error('Không tạo được tác vụ tự khởi động:', error)
-    throw new Error('Không bật được khởi động cùng Windows: cần chạy ứng dụng với quyền Admin.', {
-      cause: error
-    })
+    throw new Error(translateMain('errorAutoStartOn'), { cause: error })
   } finally {
     await rm(xmlPath, { force: true })
   }
@@ -96,8 +95,6 @@ export async function disableAdminAutoStart(): Promise<void> {
     await schtasks(['/Delete', '/TN', TASK_NAME, '/F'])
   } catch (error) {
     console.error('Không xóa được tác vụ tự khởi động:', error)
-    throw new Error('Không tắt được khởi động cùng Windows: cần chạy ứng dụng với quyền Admin.', {
-      cause: error
-    })
+    throw new Error(translateMain('errorAutoStartOff'), { cause: error })
   }
 }

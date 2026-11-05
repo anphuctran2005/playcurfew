@@ -1,11 +1,14 @@
 import { useEffect, useState } from 'react'
 import { LoaderCircle } from 'lucide-react'
-import type { AppConfig, DashboardState } from '../../shared/types'
+import { getCommitmentPhrase } from '../../shared/i18n'
+import type { AppConfig, DashboardState, Language } from '../../shared/types'
 import BlacklistTab from './components/BlacklistTab'
 import DashboardTab from './components/DashboardTab'
 import EmergencyUnlockModal from './components/EmergencyUnlockModal'
 import ScheduleTab from './components/ScheduleTab'
+import SettingsTab from './components/SettingsTab'
 import Sidebar, { type TabId } from './components/Sidebar'
+import { LanguageContext } from './lib/i18n'
 
 function App(): React.JSX.Element {
   const [dashboard, setDashboard] = useState<DashboardState | null>(null)
@@ -13,6 +16,7 @@ function App(): React.JSX.Element {
   const [activeTab, setActiveTab] = useState<TabId>('dashboard')
   const [isUnlockModalOpen, setIsUnlockModalOpen] = useState(false)
   const [now, setNow] = useState(() => Date.now())
+  const [backgroundImage, setBackgroundImage] = useState<string | null>(null)
 
   const refreshDashboard = (): void => {
     window.api.getDashboardState().then(setDashboard)
@@ -21,8 +25,17 @@ function App(): React.JSX.Element {
   useEffect(() => {
     refreshDashboard()
     window.api.getConfig().then(setConfig)
+    window.api.getBackgroundImage().then(setBackgroundImage)
     return window.api.onTickUpdate(setDashboard)
   }, [])
+
+  const theme = config?.theme
+  const language = config?.language
+
+  useEffect(() => {
+    if (theme) document.documentElement.dataset.theme = theme
+    if (language) document.documentElement.lang = language
+  }, [theme, language])
 
   const tempUnlockedUntil = dashboard?.tempUnlockedUntil ?? null
 
@@ -59,37 +72,62 @@ function App(): React.JSX.Element {
     return isUnlocked
   }
 
-  return (
-    <div className="flex h-full">
-      <Sidebar
-        activeTab={activeTab}
-        onTabChange={setActiveTab}
-        isLocked={isLocked}
-        tempUnlockMsLeft={tempUnlockMsLeft}
-        onEmergencyUnlock={() => setIsUnlockModalOpen(true)}
-      />
+  const setLanguage = async (next: Language): Promise<void> => {
+    setConfig(await window.api.updateConfig({ language: next }))
+  }
 
-      <main className="min-w-0 flex-1 overflow-y-auto p-6">
-        {activeTab === 'dashboard' && <DashboardTab dashboard={dashboard} />}
-        {activeTab === 'blacklist' && <BlacklistTab isLocked={isLocked} />}
-        {activeTab === 'schedule' && (
-          <ScheduleTab
-            config={config}
-            isLocked={isLocked}
-            onConfigChange={setConfig}
-            onChanged={refreshDashboard}
+  const hasCustomBackground = config.backgroundColor !== null || backgroundImage !== null
+
+  return (
+    <LanguageContext value={config.language}>
+      <div className="flex h-full">
+        <Sidebar
+          activeTab={activeTab}
+          onTabChange={setActiveTab}
+          isLocked={isLocked}
+          tempUnlockMsLeft={tempUnlockMsLeft}
+          language={config.language}
+          onLanguageChange={setLanguage}
+          onEmergencyUnlock={() => setIsUnlockModalOpen(true)}
+        />
+
+        <main
+          data-custom-background={hasCustomBackground ? '' : undefined}
+          style={{
+            backgroundColor: config.backgroundColor ?? undefined,
+            backgroundImage: backgroundImage ? `url("${backgroundImage}")` : undefined
+          }}
+          className="min-w-0 flex-1 overflow-y-auto bg-cover bg-center p-6"
+        >
+          {activeTab === 'dashboard' && <DashboardTab dashboard={dashboard} />}
+          {activeTab === 'blacklist' && <BlacklistTab isLocked={isLocked} />}
+          {activeTab === 'schedule' && (
+            <ScheduleTab
+              config={config}
+              isLocked={isLocked}
+              onConfigChange={setConfig}
+              onChanged={refreshDashboard}
+            />
+          )}
+          {activeTab === 'settings' && (
+            <SettingsTab
+              config={config}
+              backgroundImage={backgroundImage}
+              onConfigChange={setConfig}
+              onBackgroundImageChange={setBackgroundImage}
+            />
+          )}
+        </main>
+
+        {isUnlockModalOpen && (
+          <EmergencyUnlockModal
+            phrase={getCommitmentPhrase(config)}
+            onConfirm={startTempUnlock}
+            onClose={() => setIsUnlockModalOpen(false)}
           />
         )}
-      </main>
-
-      {isUnlockModalOpen && (
-        <EmergencyUnlockModal
-          phrase={config.commitmentPhrase}
-          onConfirm={startTempUnlock}
-          onClose={() => setIsUnlockModalOpen(false)}
-        />
-      )}
-    </div>
+      </div>
+    </LanguageContext>
   )
 }
 
