@@ -1,3 +1,18 @@
+import { Gamepad2 } from 'lucide-react'
+
+interface AppIconProps {
+  src?: string
+  className: string
+}
+
+export function AppIcon({ src, className }: AppIconProps): React.JSX.Element {
+  return src ? (
+    <img src={src} alt="" className={`${className} shrink-0 object-contain`} />
+  ) : (
+    <Gamepad2 className={`${className} shrink-0 text-slate-400`} />
+  )
+}
+
 interface PageHeaderProps {
   title: string
   subtitle: string

@@ -73,6 +73,7 @@ Output nằm ở `out/main`, `out/preload`, `out/renderer`. Alias `@renderer/*` 
 | `store.ts` | Đọc ghi dữ liệu qua `electron-store`, dữ liệu mặc định, reset usage theo ngày |
 | `processMonitor.ts` | Quét tiến trình, tắt game, vòng lặp 5 giây, thông báo, gửi `on-tick-update` |
 | `ipcHandlers.ts` | Đăng ký toàn bộ kênh `ipcMain.handle` |
+| `appScanner.ts` | Quét ứng dụng đang mở kèm icon, chọn file `.exe` hoặc `.lnk` |
 | `tray.ts` | Icon khay hệ thống, menu chuột phải cập nhật mỗi 5 giây |
 | `autoStartAdmin.ts` | Tạo, xóa task `PlayCurfewAutoStart` trong Task Scheduler |
 | `index.ts` | Single instance, thu xuống khay khi đóng, auto-start, cờ `--hidden` |
@@ -85,7 +86,7 @@ Auto-start chỉ tạo task khi `app.isPackaged`, nên bật ở `npm run dev` c
 
 Bản đóng gói có manifest `requireAdministrator`, nên chạy từ phiên không Admin sẽ lỗi 740 hoặc hỏi UAC. Muốn test tự động thì build bản riêng: `npx electron-builder --dir -c.win.requestedExecutionLevel=asInvoker`.
 
-Logic đếm giờ chỉ nằm ở main, không đặt trong React. Vòng lặp chỉ gọi `tasklist`; `getRunningProcesses()` khởi động PowerShell nên chỉ dùng khi UI cần, không gọi theo chu kỳ.
+Logic đếm giờ chỉ nằm ở main, không đặt trong React. Vòng lặp chỉ gọi `tasklist`; `getRunningGuiApps()` khởi động PowerShell nên chỉ dùng khi mở bảng chọn, không gọi theo chu kỳ.
 
 #### Renderer
 
@@ -95,7 +96,8 @@ Logic đếm giờ chỉ nằm ở main, không đặt trong React. Vòng lặp 
 | `components/ui.tsx` | `PageHeader`, `Card` dùng chung. Nút và ô nhập là class `.btn-*`, `.field` trong `assets/main.css` |
 | `components/Sidebar.tsx` | Điều hướng tab, trạng thái khóa, đếm ngược mở khóa tạm thời |
 | `components/DashboardTab.tsx` | Vòng tiến độ, badge trạng thái, lịch sử phiên chơi |
-| `components/BlacklistTab.tsx` | Quản lý game, quét cửa sổ đang mở |
+| `components/BlacklistTab.tsx` | Danh sách game kèm icon |
+| `components/AppPickerModal.tsx` | Chọn nhiều ứng dụng đang mở, chọn file, nhập tay |
 | `components/ScheduleTab.tsx` | Giới hạn phút, khung giờ Focus |
 | `components/EmergencyUnlockModal.tsx` | Gõ lại câu cam kết để mở khóa 5 phút |
 

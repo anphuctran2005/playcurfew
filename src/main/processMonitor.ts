@@ -2,7 +2,7 @@ import { execFile } from 'child_process'
 import { promisify } from 'util'
 import { BrowserWindow, Notification } from 'electron'
 import { getCommitmentPhrase } from '../shared/i18n'
-import type { DashboardState, FocusSchedule, GameItem, RunningProcess } from '../shared/types'
+import type { DashboardState, FocusSchedule, GameItem } from '../shared/types'
 import {
   addUsageSeconds,
   getConfig,
@@ -25,12 +25,6 @@ const MAX_OUTPUT_BYTES = 16 * 1024 * 1024
 const execFileAsync = promisify(execFile)
 const EXEC_OPTIONS = { windowsHide: true, maxBuffer: MAX_OUTPUT_BYTES }
 
-// Đổi encoding để tiêu đề cửa sổ tiếng Việt không bị lỗi font.
-const WINDOW_LIST_SCRIPT =
-  '[Console]::OutputEncoding = [Text.Encoding]::UTF8; ' +
-  "Get-Process | Where-Object {$_.MainWindowTitle -ne ''} | " +
-  'Select-Object Id, Name, MainWindowTitle | ConvertTo-Json'
-
 let runningGames: GameItem[] = []
 let lastViolationNoticeAt = 0
 let warnedDate = ''
@@ -38,41 +32,17 @@ const warnedMarks = new Set<number>() // Số giây còn lại của các mốc 
 let isTicking = false
 let tempUnlockedUntil: number | null = null // Chỉ ở bộ nhớ: khởi động lại app là khóa lại
 
-async function listTasks(): Promise<Omit<RunningProcess, 'windowTitle'>[]> {
+async function listTaskNames(): Promise<string[]> {
   try {
     const { stdout } = await execFileAsync('tasklist', ['/FO', 'CSV', '/NH'], EXEC_OPTIONS)
     return stdout.split(/\r?\n/).flatMap((line) => {
-      const match = /^"([^"]+)","(\d+)"/.exec(line)
-      return match ? [{ exeName: match[1], pid: Number(match[2]) }] : []
+      const match = /^"([^"]+)"/.exec(line)
+      return match ? [match[1]] : []
     })
   } catch (error) {
     console.error('tasklist thất bại:', error)
     return []
   }
-}
-
-async function listWindowTitles(): Promise<Map<number, string>> {
-  try {
-    const { stdout } = await execFileAsync(
-      'powershell',
-      ['-NoProfile', '-NonInteractive', '-Command', WINDOW_LIST_SCRIPT],
-      EXEC_OPTIONS
-    )
-    if (!stdout.trim()) return new Map()
-
-    // ConvertTo-Json trả về object thay vì mảng khi chỉ có một cửa sổ.
-    const windows: { Id: number; MainWindowTitle: string }[] = [JSON.parse(stdout)].flat()
-    return new Map(windows.map((w) => [w.Id, w.MainWindowTitle]))
-  } catch (error) {
-    console.error('Không lấy được danh sách cửa sổ:', error)
-    return new Map()
-  }
-}
-
-/** Mỗi lần gọi khởi động một PowerShell, nên vòng lặp 5 giây chỉ dùng listTasks(). */
-export async function getRunningProcesses(): Promise<RunningProcess[]> {
-  const [tasks, titles] = await Promise.all([listTasks(), listWindowTitles()])
-  return tasks.map((task) => ({ ...task, windowTitle: titles.get(task.pid) ?? '' }))
 }
 
 export async function killProcess(exeName: string): Promise<boolean> {
@@ -204,7 +174,7 @@ async function tick(getWindow: () => BrowserWindow | null, onTick: () => void): 
   isTicking = true
 
   try {
-    const running = new Set((await listTasks()).map((task) => task.exeName.toLowerCase()))
+    const running = new Set((await listTaskNames()).map((name) => name.toLowerCase()))
     runningGames = getGames().filter(
       (game) => game.isActive && running.has(game.exeName.toLowerCase())
     )

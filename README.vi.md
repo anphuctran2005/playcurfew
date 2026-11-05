@@ -24,6 +24,7 @@
 
 - **Giới hạn giờ chơi mỗi ngày:** đặt riêng cho ngày thường (Thứ 2 - Thứ 6) và cuối tuần (Thứ 7 - CN).
 - **Khung giờ Focus:** game trong danh sách sẽ bị tắt nếu mở trong giờ học, kể cả khung giờ vắt qua nửa đêm.
+- **Chọn ứng dụng trực quan:** thêm game bằng cách bấm chọn, có icon thật, không cần gõ tên `.exe`.
 - **Theo dõi tự động:** cứ 5 giây quét tiến trình Windows một lần, cộng giờ chơi và tắt game khi vi phạm.
 - **Cảnh báo:** thông báo khi còn 5 phút và 1 phút chơi.
 - **Khóa cài đặt:** khi đang chơi, đang trong giờ Focus hoặc đã hết giờ, các thao tác nới lỏng quy tắc bị vô hiệu hóa.
@@ -81,14 +82,17 @@ Bộ cài nằm tại `dist/PlayCurfew-Setup.exe`.
 
 ### Bước 1: Thêm game cần kiểm soát
 
-Mở tab **Danh sách game**. Có hai cách thêm game:
+Mở tab **Danh sách game** rồi bấm **Thêm Game / Ứng dụng**. Có ba cách thêm:
 
-- **Nhập tay:** điền tên hiển thị và tên file, ví dụ `masterduel.exe`, rồi bấm **Thêm**.
-- **Quét ứng dụng đang mở:** mở game trước, bấm nút quét, chọn cửa sổ của game trong danh sách, sửa tên hiển thị nếu cần rồi bấm **Thêm**.
+- **Từ ứng dụng đang mở:** bảng chọn hiện các ứng dụng đang mở cùng icon thật. Hãy mở game trước, tìm theo tên hoặc tên `.exe` nếu cần, tick một hoặc nhiều ứng dụng rồi bấm **Thêm các ứng dụng đã chọn**. Ứng dụng đã có trong danh sách sẽ hiện **Đã thêm**.
+- **Từ máy tính:** bấm **Chọn từ máy tính (File .exe hoặc Shortcut Desktop)** rồi chọn file `.exe` hoặc shortcut `.lnk`. Ứng dụng được thêm ngay.
+- **Nhập tay:** mở mục **Tự nhập tên thủ công (Nâng cao)**, điền tên hiển thị và tên file, ví dụ `masterduel.exe`, rồi bấm **Thêm**.
 
 ![Thêm game vào danh sách](docs/images/vi/02-add-game.png)
 
 Dùng công tắc để bật hoặc tắt theo dõi từng game.
+
+Shortcut Internet (`.url`), như loại một số trình quản lý game tạo ra, không đọc được. Với các game này, hãy chọn từ ứng dụng đang mở hoặc chọn file `.exe` của game.
 
 > **Cẩn thận:** ứng dụng trong danh sách sẽ bị buộc tắt khi vi phạm, dữ liệu chưa lưu sẽ mất. Chỉ thêm game, không thêm trình duyệt, trình soạn thảo hay `explorer.exe`.
 

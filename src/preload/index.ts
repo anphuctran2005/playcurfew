@@ -5,7 +5,8 @@ import type { DashboardState, WindowApi } from '../shared/types'
 const api: WindowApi = {
   getDashboardState: () => ipcRenderer.invoke('get-dashboard-state'),
   getTodayUsage: () => ipcRenderer.invoke('get-today-usage'),
-  getRunningProcesses: () => ipcRenderer.invoke('get-running-processes'),
+  scanRunningApps: () => ipcRenderer.invoke('scan-running-apps'),
+  browseAppFile: () => ipcRenderer.invoke('browse-app-file'),
 
   getConfig: () => ipcRenderer.invoke('get-config'),
   updateConfig: (patch) => ipcRenderer.invoke('update-config', patch),

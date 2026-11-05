@@ -3,6 +3,7 @@ export interface GameItem {
   name: string // Tên hiển thị (VD: "Yu-Gi-Oh! Master Duel")
   exeName: string // Tên file thực thi (VD: "masterduel.exe")
   isActive: boolean // Có đang bật theo dõi hay không
+  iconDataUrl?: string // Icon thật của ứng dụng, dạng base64
 }
 
 export interface FocusSchedule {
@@ -42,10 +43,12 @@ export interface DailyUsage {
   sessions: SessionLog[]
 }
 
-export interface RunningProcess {
-  pid: number
-  exeName: string
-  windowTitle: string // Rỗng nếu là tiến trình ngầm
+export interface DiscoveredApp {
+  name: string // Tên thân thiện: tiêu đề cửa sổ hoặc tên shortcut
+  exeName: string // VD: "masterduel.exe"
+  exePath: string // Đường dẫn đầy đủ để trích xuất icon
+  iconDataUrl?: string // Icon dạng base64
+  source: 'running' | 'installed'
 }
 
 export interface DashboardState {
@@ -67,7 +70,9 @@ export type NewFocusSchedule = Omit<FocusSchedule, 'id'>
 export interface WindowApi {
   getDashboardState: () => Promise<DashboardState>
   getTodayUsage: () => Promise<DailyUsage>
-  getRunningProcesses: () => Promise<RunningProcess[]>
+  scanRunningApps: () => Promise<DiscoveredApp[]>
+  /** Trả về null nếu người dùng hủy hộp thoại. */
+  browseAppFile: () => Promise<DiscoveredApp | null>
 
   getConfig: () => Promise<AppConfig>
   updateConfig: (patch: Partial<AppConfig>) => Promise<AppConfig>

@@ -1,7 +1,8 @@
 import { BrowserWindow, ipcMain } from 'electron'
 import type { AppConfig, NewFocusSchedule, NewGame } from '../shared/types'
+import { browseExecutableOrShortcut, getRunningGuiApps } from './appScanner'
 import { getBackgroundImage, pickBackgroundImage, removeBackgroundImage } from './background'
-import { getDashboardState, getRunningProcesses, verifyEmergencyUnlock } from './processMonitor'
+import { getDashboardState, verifyEmergencyUnlock } from './processMonitor'
 import {
   addFocusSchedule,
   addGame,
@@ -20,7 +21,10 @@ import { updateTrayMenu } from './tray'
 export function registerIpcHandlers(applyAutoStart: (enabled: boolean) => Promise<void>): void {
   ipcMain.handle('get-dashboard-state', () => getDashboardState())
   ipcMain.handle('get-today-usage', () => getTodayUsage())
-  ipcMain.handle('get-running-processes', () => getRunningProcesses())
+  ipcMain.handle('scan-running-apps', () => getRunningGuiApps())
+  ipcMain.handle('browse-app-file', (event) =>
+    browseExecutableOrShortcut(BrowserWindow.fromWebContents(event.sender))
+  )
 
   ipcMain.handle('get-config', () => getConfig())
   ipcMain.handle('update-config', async (_, patch: Partial<AppConfig>) => {

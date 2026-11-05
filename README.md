@@ -24,6 +24,7 @@
 
 - **Daily play limits:** set separate limits for weekdays (Monday to Friday) and weekends (Saturday and Sunday).
 - **Focus schedules:** listed games are closed if opened during study hours, including schedules that run past midnight.
+- **Visual app picker:** add games by clicking them, with real icons. No need to type `.exe` names.
 - **Automatic tracking:** scans Windows processes every 5 seconds, counts play time, and closes games that break the rules.
 - **Warnings:** notifies you when 5 minutes and 1 minute of play time remain.
 - **Settings lock:** while you are playing, during Focus hours, or after your time runs out, actions that loosen the rules are disabled.
@@ -81,14 +82,17 @@ The screenshots below were taken from the real app with sample data.
 
 ### Step 1: Add the games to control
 
-Open the **Game list** tab. There are two ways to add a game:
+Open the **Game list** tab and click **Add game / app**. You can add apps in three ways:
 
-- **Manually:** enter a display name and the file name, such as `masterduel.exe`, then click **Add**.
-- **Scan open apps:** open the game first, click **Scan open apps**, pick the game's window from the list, edit the display name if needed, then click **Add**.
+- **From open apps:** the picker lists the apps open right now, with their real icons. Open your game first, search by name or `.exe` name if needed, tick one or more apps, then click **Add selected apps**. Apps already in your list show **Added**.
+- **From your computer:** click **Choose from computer (.exe file or Desktop shortcut)** and select an `.exe` file or `.lnk` shortcut. It is added right away.
+- **Manually:** expand **Enter name manually (Advanced)**, enter a display name and the file name, such as `masterduel.exe`, then click **Add**.
 
 ![Adding a game to the list](docs/images/en/02-add-game.png)
 
 Use the switch to turn tracking on or off for each game.
+
+Internet shortcuts (`.url`), such as those some game launchers create, cannot be read. For those games, use open apps or select the game's `.exe` file.
 
 > **Warning:** apps in this list are force-closed when they break the rules, and unsaved data is lost. Only add games. Do not add browsers, editors, or `explorer.exe`.
 
