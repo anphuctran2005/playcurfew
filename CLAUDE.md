@@ -104,6 +104,7 @@ Logic đếm giờ chỉ nằm ở main, không đặt trong React. Vòng lặp 
 #### Logo và ảnh tài liệu
 
 - Nguồn logo là `src/renderer/src/assets/logo.svg`. Sửa xong chạy `npm run icons` để tạo lại `build/icon.*` và `resources/icon.png`.
+- `README.md` là bản tiếng Anh gốc, `README.vi.md` là bản tiếng Việt. Sửa một bản thì sửa cả bản kia.
 - Ảnh trong README nằm ở `docs/images/`, chụp từ app thật với dữ liệu mẫu. Không chụp danh sách quét cửa sổ vì lộ cửa sổ đang mở trên máy.
 - electron-builder đóng gói mọi file trừ khi loại trừ. Thêm thư mục mới ở gốc repo thì phải thêm vào `files` trong `electron-builder.yml`.
 

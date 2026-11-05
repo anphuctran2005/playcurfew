@@ -1,183 +1,191 @@
 <p align="center">
-  <img src="resources/icon.png" alt="Logo PlayCurfew" width="120" />
+  <img src="resources/icon.png" alt="PlayCurfew logo" width="120" />
 </p>
 
 <h1 align="center">PlayCurfew</h1>
 
 <p align="center">
-  Ứng dụng Windows giúp bạn tự kiểm soát thời gian chơi game.<br />
-  Đếm số phút chơi mỗi ngày, tự tắt game khi hết giờ hoặc khi đang trong giờ học.
+  <img src="https://img.shields.io/badge/Language-English-2563eb?style=flat-square" alt="Reading the English version" />
+  <a href="README.vi.md"><img src="https://img.shields.io/badge/Ng%C3%B4n%20ng%E1%BB%AF-Ti%E1%BA%BFng%20Vi%E1%BB%87t-475569?style=flat-square" alt="Đọc bản tiếng Việt" /></a>
 </p>
 
 <p align="center">
-  <a href="https://github.com/anphuctran2005/playcurfew/releases/latest/download/PlayCurfew-Setup.exe"><img src="https://img.shields.io/badge/T%E1%BA%A3i%20v%E1%BB%81%20cho%20Windows-PlayCurfew--Setup.exe-2563eb?style=for-the-badge" alt="Tải về cho Windows" /></a>
+  A Windows app that helps you control your own gaming time.<br />
+  It counts your minutes each day and closes games when time runs out or during study hours.
 </p>
 
-![Màn hình Tổng quan của PlayCurfew](docs/images/01-tong-quan.png)
+<p align="center">
+  <a href="https://github.com/anphuctran2005/playcurfew/releases/latest/download/PlayCurfew-Setup.exe"><img src="https://img.shields.io/badge/Download%20for%20Windows-PlayCurfew--Setup.exe-2563eb?style=for-the-badge" alt="Download for Windows" /></a>
+</p>
 
-## Tính năng
+![PlayCurfew dashboard](docs/images/01-tong-quan.png)
 
-- **Giới hạn giờ chơi mỗi ngày:** đặt riêng cho ngày thường (Thứ 2 - Thứ 6) và cuối tuần (Thứ 7 - CN).
-- **Khung giờ Focus:** game trong danh sách sẽ bị tắt nếu mở trong giờ học, kể cả khung giờ vắt qua nửa đêm.
-- **Theo dõi tự động:** cứ 5 giây quét tiến trình Windows một lần, cộng giờ chơi và tắt game khi vi phạm.
-- **Cảnh báo:** thông báo khi còn 5 phút và 1 phút chơi.
-- **Khóa cài đặt:** khi đang chơi, đang trong giờ Focus hoặc đã hết giờ, các thao tác nới lỏng quy tắc bị vô hiệu hóa.
-- **Mở khóa khẩn cấp:** phải tự gõ lại một câu cam kết, không dán được, để mở khóa trong 5 phút.
-- **Lịch sử:** xem các phiên chơi trong ngày với giờ bắt đầu và thời lượng.
-- **Chạy ngầm:** đóng cửa sổ chỉ thu xuống khay hệ thống, ứng dụng vẫn theo dõi. Nút Thoát bị khóa khi đang khóa cài đặt.
-- **Khởi động cùng Windows:** tự chạy ngầm dưới khay hệ thống khi bật máy.
+> The app interface is currently in Vietnamese only. The guide below shows the Vietnamese label in bold, followed by its English meaning.
 
-## Yêu cầu
+## Features
 
-- Windows 10 hoặc Windows 11 (64-bit)
-- Tài khoản có quyền Administrator
-- Node.js 20.19+ hoặc 22.12+ (đã kiểm thử với Node 24) và npm, chỉ cần khi cài từ mã nguồn
+- **Daily play limits:** set separate limits for weekdays (Monday to Friday) and weekends (Saturday and Sunday).
+- **Focus schedules:** listed games are closed if opened during study hours, including schedules that run past midnight.
+- **Automatic tracking:** scans Windows processes every 5 seconds, counts play time, and closes games that break the rules.
+- **Warnings:** notifies you when 5 minutes and 1 minute of play time remain.
+- **Settings lock:** while you are playing, during Focus hours, or after your time runs out, actions that loosen the rules are disabled.
+- **Emergency unlock:** you must retype a commitment sentence by hand, with no pasting, to unlock for 5 minutes.
+- **History:** see today's play sessions with start times and durations.
+- **Background mode:** closing the window only minimizes the app to the system tray, and tracking continues. The Quit option is disabled while settings are locked.
+- **Start with Windows:** runs in the system tray when you sign in.
 
-## Cài đặt
+## Requirements
 
-### Dùng bộ cài
+- Windows 10 or Windows 11 (64-bit)
+- An account with Administrator rights
+- Node.js 20.19+ or 22.12+ (tested with Node 24) and npm, only when installing from source
 
-1. Bấm nút **Tải về cho Windows** ở đầu trang.
-2. Chạy file `PlayCurfew-Setup.exe` vừa tải, chọn thư mục cài đặt rồi bấm **Install**. Bộ cài tạo lối tắt trên Desktop và mở ứng dụng khi xong.
+## Installation
 
-PlayCurfew cần quyền Administrator để tắt được game có Anti-Cheat, nên Windows sẽ hỏi xác nhận (UAC) mỗi lần bạn tự mở ứng dụng. Khi bật **Khởi động cùng Windows**, ứng dụng tự chạy lúc đăng nhập mà không hỏi lại.
+### Using the installer
 
-Bộ cài chưa được ký số nên Windows có thể hiện cảnh báo SmartScreen. Bấm **More info** rồi **Run anyway** để tiếp tục.
+1. Click **Download for Windows** at the top of this page.
+2. Run the downloaded `PlayCurfew-Setup.exe`, choose an install folder, then click **Install**. The installer creates a Desktop shortcut and opens the app when it finishes.
 
-### Cài từ mã nguồn
+PlayCurfew needs Administrator rights to close games protected by anti-cheat software, so Windows asks for confirmation (UAC) each time you open the app yourself. With **Start with Windows** turned on, the app starts at sign-in without asking.
 
-Tải dependency:
+The installer is not code-signed, so Windows may show a SmartScreen warning. Click **More info**, then **Run anyway** to continue.
+
+### From source
+
+Install the dependencies:
 
 ```bash
 npm install
 ```
 
-npm có thể báo chặn install script của `better-sqlite3`. Có thể bỏ qua cảnh báo này.
+npm may report a blocked install script for `better-sqlite3`. You can ignore this warning.
 
-Chạy ở chế độ phát triển:
+Run in development mode:
 
 ```bash
 npm run dev
 ```
 
-Tạo bộ cài cho Windows:
+Build the Windows installer:
 
 ```bash
 npm run build:win
 ```
 
-Bộ cài nằm tại `dist/PlayCurfew-Setup.exe`.
+The installer is written to `dist/PlayCurfew-Setup.exe`.
 
-## Hướng dẫn sử dụng
+## How to use
 
-Ảnh dưới đây được chụp từ ứng dụng thật với dữ liệu mẫu.
+The screenshots below were taken from the real app with sample data.
 
-### Bước 1: Thêm game cần kiểm soát
+### Step 1: Add the games to control
 
-Mở tab **Danh sách game**. Có hai cách thêm game:
+Open the **Danh sách game** (Game list) tab. There are two ways to add a game:
 
-- **Nhập tay:** điền tên hiển thị và tên file, ví dụ `masterduel.exe`, rồi bấm **Thêm**.
-- **Quét ứng dụng đang mở:** mở game trước, bấm nút quét, chọn cửa sổ của game trong danh sách, sửa tên hiển thị nếu cần rồi bấm **Thêm**.
+- **Manually:** enter a display name and the file name, such as `masterduel.exe`, then click **Thêm** (Add).
+- **Scan open apps:** open the game first, click **Quét ứng dụng đang mở** (Scan open apps), pick the game's window from the list, edit the display name if needed, then click **Thêm** (Add).
 
-![Thêm game vào danh sách](docs/images/02-them-game.png)
+![Adding a game to the list](docs/images/02-them-game.png)
 
-Dùng công tắc để bật hoặc tắt theo dõi từng game.
+Use the switch to turn tracking on or off for each game.
 
-> **Cẩn thận:** ứng dụng trong danh sách sẽ bị buộc tắt khi vi phạm, dữ liệu chưa lưu sẽ mất. Chỉ thêm game, không thêm trình duyệt, trình soạn thảo hay `explorer.exe`.
+> **Warning:** apps in this list are force-closed when they break the rules, and unsaved data is lost. Only add games. Do not add browsers, editors, or `explorer.exe`.
 
-### Bước 2: Đặt giới hạn và khung giờ Focus
+### Step 2: Set limits and Focus schedules
 
-Mở tab **Giới hạn & Focus**.
+Open the **Giới hạn & Focus** (Limits & Focus) tab.
 
-- **Giới hạn mỗi ngày:** kéo thanh trượt hoặc nhập số phút, rồi bấm **Lưu cấu hình**.
-- **Khung giờ Focus:** nhập nhãn, giờ bắt đầu và kết thúc theo dạng 24 giờ (ví dụ `19:30`), chọn các ngày trong tuần rồi bấm **Thêm khung giờ**. Giờ kết thúc nhỏ hơn giờ bắt đầu nghĩa là kết thúc vào hôm sau.
+- **Daily limits:** drag the slider or enter the minutes, then click **Lưu cấu hình** (Save settings).
+- **Focus schedules:** enter a label, a start and end time in 24-hour format (such as `19:30`), choose the days of the week, then click **Thêm khung giờ** (Add schedule). An end time earlier than the start time means the schedule ends the next day.
 
-![Cài đặt giới hạn và khung giờ Focus](docs/images/03-gioi-han-focus.png)
+![Setting limits and Focus schedules](docs/images/03-gioi-han-focus.png)
 
-Khung giờ đã tạo có thể bật, tắt, thêm hoặc bớt ngày, và xóa. Để đổi giờ, hãy xóa rồi tạo khung giờ mới.
+Existing schedules can be turned on or off, have days added or removed, and be deleted. To change the times, delete the schedule and create a new one.
 
-### Bước 3: Theo dõi ở màn hình Tổng quan
+### Step 3: Follow your day on the dashboard
 
-Vòng tròn cho biết số phút đã chơi trên giới hạn hôm nay:
+The ring on the **Tổng quan** (Overview) tab shows minutes played against today's limit:
 
-| Màu | Ý nghĩa |
+| Color | Meaning |
 | --- | --- |
-| Xanh lá | Đã dùng dưới 70% giới hạn |
-| Vàng | Đã dùng từ 70% trở lên, hoặc còn dưới 15 phút |
-| Đỏ | Đã hết giờ, hoặc đang trong giờ Focus |
+| Green | Less than 70% of the limit used |
+| Yellow | 70% or more used, or less than 15 minutes left |
+| Red | Out of time, or during Focus hours |
 
-Khi bạn mở một game trong danh sách, thanh trạng thái chuyển sang màu vàng và thời gian bắt đầu được tính:
+When you open a listed game, the status bar turns yellow and play time starts counting:
 
-![Màn hình khi đang chơi game](docs/images/04-dang-choi.png)
+![The dashboard while playing a game](docs/images/04-dang-choi.png)
 
-Trong giờ Focus, thanh trạng thái và vòng tròn chuyển sang màu đỏ, game đang mở sẽ bị tắt:
+During Focus hours, the status bar and ring turn red, and open games are closed:
 
-![Màn hình trong giờ Focus](docs/images/08-gio-focus.png)
+![The dashboard during Focus hours](docs/images/08-gio-focus.png)
 
-### Chạy ngầm và khay hệ thống
+### Background mode and the system tray
 
-Bấm nút đóng cửa sổ chỉ thu ứng dụng xuống khay hệ thống, cạnh đồng hồ. Bấm vào biểu tượng để mở lại, bấm chuột phải để xem số phút còn lại hoặc thoát ứng dụng.
+Closing the window only minimizes the app to the system tray, next to the clock. Click the icon to open it again, or right-click to see the minutes left or quit the app.
 
-Bật **Khởi động cùng Windows** ở đầu tab **Giới hạn & Focus** để ứng dụng tự chạy ngầm mỗi khi đăng nhập. Tùy chọn này tạo tác vụ `PlayCurfewAutoStart` trong Task Scheduler.
+Turn on **Khởi động cùng Windows** (Start with Windows) at the top of the **Giới hạn & Focus** tab to run the app in the background each time you sign in. This creates a `PlayCurfewAutoStart` task in Task Scheduler.
 
-### Cơ chế khóa
+### How the lock works
 
-Cài đặt tự khóa khi có một trong ba điều kiện: đang trong giờ Focus, đã hết giờ chơi hôm nay, hoặc đang có game được theo dõi chạy. Các thao tác bị khóa hiện biểu tượng ổ khóa.
+Settings lock automatically in any of three cases: during Focus hours, when today's play time has run out, or while a tracked game is running. Locked actions show a padlock icon.
 
-![Danh sách game khi đang khóa](docs/images/05-dang-khoa.png)
+![The game list while locked](docs/images/05-dang-khoa.png)
 
-| Thao tác | Khi đang khóa |
+| Action | While locked |
 | --- | --- |
-| Thêm game, bật theo dõi | Được phép |
-| Tắt theo dõi, xóa game | Bị khóa |
-| Giảm giới hạn phút | Được phép |
-| Tăng giới hạn phút | Bị khóa |
-| Thêm khung giờ Focus, thêm ngày, bật khung giờ | Được phép |
-| Tắt, xóa khung giờ Focus, bớt ngày | Bị khóa |
-| Bật, tắt khởi động cùng Windows | Bị khóa |
-| Thoát ứng dụng từ khay hệ thống | Bị khóa |
+| Add a game, turn tracking on | Allowed |
+| Turn tracking off, delete a game | Locked |
+| Lower the minute limit | Allowed |
+| Raise the minute limit | Locked |
+| Add a Focus schedule, add a day, turn a schedule on | Allowed |
+| Turn off or delete a Focus schedule, remove a day | Locked |
+| Turn Start with Windows on or off | Locked |
+| Quit from the system tray | Locked |
 
-### Mở khóa khẩn cấp
+### Emergency unlock
 
-1. Bấm **Mở khóa khẩn cấp** ở thanh bên. Nút này chỉ hiện khi đang khóa.
-2. Gõ lại chính xác câu cam kết, gồm cả dấu câu và chữ hoa, chữ thường. Không thể dán văn bản. Ký tự đúng hiện màu xanh, ký tự sai hiện nền đỏ.
-3. Khi câu khớp hoàn toàn, nút **Xác nhận Mở khóa (5 phút)** sáng lên. Bấm nút này.
+1. Click **Mở khóa khẩn cấp** (Emergency unlock) in the sidebar. This button only appears while locked.
+2. Retype the commitment sentence exactly, including punctuation and capitalization. The sentence is in Vietnamese and pasting is blocked. Correct characters turn green, and wrong ones get a red background.
+3. Once the sentence matches completely, the **Xác nhận Mở khóa (5 phút)** (Confirm unlock, 5 minutes) button lights up. Click it.
 
-![Gõ lại câu cam kết để mở khóa](docs/images/06-mo-khoa-khan-cap.png)
+![Retyping the commitment sentence to unlock](docs/images/06-mo-khoa-khan-cap.png)
 
-Thanh bên sẽ hiện đồng hồ đếm ngược. Hết 5 phút, cài đặt tự khóa lại. Mở khóa chỉ cho phép sửa cài đặt và thoát ứng dụng: game vẫn bị tắt nếu đang trong giờ Focus hoặc đã hết giờ.
+The sidebar shows a countdown, and settings lock again after 5 minutes. Unlocking only lets you change settings and quit the app: games are still closed during Focus hours or once your time runs out.
 
-![Đồng hồ đếm ngược khi mở khóa tạm thời](docs/images/07-mo-khoa-tam-thoi.png)
+![The countdown during a temporary unlock](docs/images/07-mo-khoa-tam-thoi.png)
 
-## Dữ liệu
+## Your data
 
-Toàn bộ dữ liệu lưu trên máy tại `%APPDATA%\playcurfew\config.json`, không gửi đi đâu. Số giờ chơi tự đặt lại khi sang ngày mới.
+All data stays on your computer at `%APPDATA%\playcurfew\config.json` and is never sent anywhere. Play time resets automatically each day.
 
-## Hạn chế hiện tại
+## Current limitations
 
-- **Vẫn có thể tắt bằng Task Manager.** Khóa nút Thoát chỉ chặn thoát từ ứng dụng. Tắt tiến trình bằng Task Manager thì việc theo dõi sẽ dừng.
-- **Sửa cấu hình không bị chặn.** Sửa trực tiếp `config.json` vẫn thay đổi được cài đặt. PlayCurfew là công cụ hỗ trợ kỷ luật, không phải biện pháp chống phá.
-- **Gỡ cài đặt:** tác vụ `PlayCurfewAutoStart` không tự bị xóa. Hãy tắt **Khởi động cùng Windows** trước khi gỡ.
+- **Task Manager can still end the app.** The Quit lock only covers quitting from within the app. Ending the process in Task Manager stops tracking.
+- **Editing the config is not blocked.** Editing `config.json` directly still changes settings. PlayCurfew is a discipline aid, not a tamper-proof control.
+- **Uninstalling:** the `PlayCurfewAutoStart` task is not removed automatically. Turn off **Start with Windows** before uninstalling.
+- **Language:** the app interface is in Vietnamese only.
 
-## Dành cho nhà phát triển
+## For developers
 
-| Lệnh | Tác dụng |
+| Command | Purpose |
 | --- | --- |
-| `npm run dev` | Chạy ứng dụng với HMR |
-| `npm run typecheck` | Kiểm tra TypeScript |
-| `npm run lint` | Chạy ESLint |
-| `npm run icons` | Tạo lại bộ icon từ `src/renderer/src/assets/logo.svg` |
-| `npm run build` | Typecheck rồi bundle vào `out/` |
-| `npm run build:unpack` | Đóng gói không cài đặt vào `dist/win-unpacked/` |
-| `npm run build:win` | Tạo bộ cài Windows |
+| `npm run dev` | Run the app with HMR |
+| `npm run typecheck` | Check TypeScript |
+| `npm run lint` | Run ESLint |
+| `npm run icons` | Regenerate the icons from `src/renderer/src/assets/logo.svg` |
+| `npm run build` | Typecheck, then bundle into `out/` |
+| `npm run build:unpack` | Package without an installer into `dist/win-unpacked/` |
+| `npm run build:win` | Build the Windows installer |
 
-Mã nguồn gồm ba tầng trong `src/`, cùng phần kiểu dữ liệu dùng chung:
+The source has three layers in `src/`, plus shared types:
 
-| Thư mục | Vai trò |
+| Folder | Role |
 | --- | --- |
-| `src/main/` | Quét tiến trình, đếm giờ, tắt game, lưu dữ liệu, xử lý IPC |
-| `src/preload/` | Cầu nối `window.api` giữa main và renderer |
-| `src/renderer/` | Giao diện React, Tailwind CSS |
-| `src/shared/` | Kiểu dữ liệu dùng chung |
+| `src/main/` | Process scanning, time tracking, closing games, storage, IPC |
+| `src/preload/` | The `window.api` bridge between main and renderer |
+| `src/renderer/` | React interface with Tailwind CSS |
+| `src/shared/` | Shared data types |
 
-Đặc tả dữ liệu nằm trong [SPEC.md](SPEC.md), quy ước phát triển nằm trong [CLAUDE.md](CLAUDE.md).
+The data specification is in [SPEC.md](SPEC.md), and the development conventions are in [CLAUDE.md](CLAUDE.md).
