@@ -149,6 +149,15 @@ function ScheduleTab({
     }
   }
 
+  const setLaunchAtStartup = async (launchAtStartup: boolean): Promise<void> => {
+    try {
+      onConfigChange(await window.api.updateConfig({ launchAtStartup }))
+      setError('')
+    } catch (e) {
+      setError(errorMessage(e))
+    }
+  }
+
   const run = async (action: () => Promise<unknown>): Promise<boolean> => {
     try {
       await action()
@@ -192,10 +201,25 @@ function ScheduleTab({
 
       {isLocked && (
         <LockNotice>
-          Không thể tăng giới hạn phút, tắt, xóa hoặc bớt ngày của khung giờ Focus lúc này.
+          Không thể đổi khởi động cùng Windows, tăng giới hạn phút, tắt, xóa hoặc bớt ngày của khung
+          giờ Focus lúc này.
         </LockNotice>
       )}
       {error && <p className="text-sm text-red-400">{error}</p>}
+
+      <section className="flex items-center justify-between gap-4 rounded-xl border border-slate-700 bg-slate-800 px-4 py-3">
+        <div>
+          <h3 className="text-sm font-semibold">Khởi động cùng Windows</h3>
+          <p className="text-xs text-slate-400">Tự chạy ngầm dưới khay hệ thống khi bật máy.</p>
+        </div>
+        <Toggle
+          checked={config.launchAtStartup}
+          label="Khởi động cùng Windows"
+          isLocked={isLocked}
+          lockBothWays
+          onChange={setLaunchAtStartup}
+        />
+      </section>
 
       <Card
         title="Giới hạn mỗi ngày"

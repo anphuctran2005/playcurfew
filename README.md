@@ -24,6 +24,8 @@
 - **Khóa cài đặt:** khi đang chơi, đang trong giờ Focus hoặc đã hết giờ, các thao tác nới lỏng quy tắc bị vô hiệu hóa.
 - **Mở khóa khẩn cấp:** phải tự gõ lại một câu cam kết, không dán được, để mở khóa trong 5 phút.
 - **Lịch sử:** xem các phiên chơi trong ngày với giờ bắt đầu và thời lượng.
+- **Chạy ngầm:** đóng cửa sổ chỉ thu xuống khay hệ thống, ứng dụng vẫn theo dõi. Nút Thoát bị khóa khi đang khóa cài đặt.
+- **Khởi động cùng Windows:** tự chạy ngầm dưới khay hệ thống khi bật máy.
 
 ## Yêu cầu
 
@@ -109,6 +111,12 @@ Trong giờ Focus, thanh trạng thái và vòng tròn chuyển sang màu đỏ,
 
 ![Màn hình trong giờ Focus](docs/images/08-gio-focus.png)
 
+### Chạy ngầm và khay hệ thống
+
+Bấm nút đóng cửa sổ chỉ thu ứng dụng xuống khay hệ thống, cạnh đồng hồ. Bấm vào biểu tượng để mở lại, bấm chuột phải để xem số phút còn lại hoặc thoát ứng dụng.
+
+Bật **Khởi động cùng Windows** ở đầu tab **Giới hạn & Focus** để ứng dụng tự chạy ngầm mỗi khi bật máy.
+
 ### Cơ chế khóa
 
 Cài đặt tự khóa khi có một trong ba điều kiện: đang trong giờ Focus, đã hết giờ chơi hôm nay, hoặc đang có game được theo dõi chạy. Các thao tác bị khóa hiện biểu tượng ổ khóa.
@@ -123,6 +131,8 @@ Cài đặt tự khóa khi có một trong ba điều kiện: đang trong giờ 
 | Tăng giới hạn phút | Bị khóa |
 | Thêm khung giờ Focus, thêm ngày, bật khung giờ | Được phép |
 | Tắt, xóa khung giờ Focus, bớt ngày | Bị khóa |
+| Bật, tắt khởi động cùng Windows | Bị khóa |
+| Thoát ứng dụng từ khay hệ thống | Bị khóa |
 
 ### Mở khóa khẩn cấp
 
@@ -132,7 +142,7 @@ Cài đặt tự khóa khi có một trong ba điều kiện: đang trong giờ 
 
 ![Gõ lại câu cam kết để mở khóa](docs/images/06-mo-khoa-khan-cap.png)
 
-Thanh bên sẽ hiện đồng hồ đếm ngược. Hết 5 phút, cài đặt tự khóa lại. Mở khóa chỉ cho phép sửa cài đặt: game vẫn bị tắt nếu đang trong giờ Focus hoặc đã hết giờ.
+Thanh bên sẽ hiện đồng hồ đếm ngược. Hết 5 phút, cài đặt tự khóa lại. Mở khóa chỉ cho phép sửa cài đặt và thoát ứng dụng: game vẫn bị tắt nếu đang trong giờ Focus hoặc đã hết giờ.
 
 ![Đồng hồ đếm ngược khi mở khóa tạm thời](docs/images/07-mo-khoa-tam-thoi.png)
 
@@ -142,9 +152,8 @@ Toàn bộ dữ liệu lưu trên máy tại `%APPDATA%\playcurfew\config.json`,
 
 ## Hạn chế hiện tại
 
-- **Đóng cửa sổ là dừng theo dõi.** Chưa có chế độ chạy ngầm ở khay hệ thống, nên ứng dụng phải mở thì mới đếm giờ và tắt game.
-- **Chưa khởi động cùng Windows.** Tùy chọn `launchAtStartup` có trong cấu hình nhưng chưa có tác dụng.
-- **Khóa nằm ở giao diện.** Sửa trực tiếp `config.json` vẫn thay đổi được cài đặt. PlayCurfew là công cụ hỗ trợ kỷ luật, không phải biện pháp chống phá.
+- **Vẫn có thể tắt bằng Task Manager.** Khóa nút Thoát chỉ chặn thoát từ ứng dụng. Tắt tiến trình bằng Task Manager thì việc theo dõi sẽ dừng.
+- **Sửa cấu hình không bị chặn.** Sửa trực tiếp `config.json` vẫn thay đổi được cài đặt. PlayCurfew là công cụ hỗ trợ kỷ luật, không phải biện pháp chống phá.
 - **Game chạy quyền Administrator** có thể không tắt được nếu PlayCurfew chạy với quyền thường.
 
 ## Dành cho nhà phát triển

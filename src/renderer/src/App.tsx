@@ -7,14 +7,11 @@ import EmergencyUnlockModal from './components/EmergencyUnlockModal'
 import ScheduleTab from './components/ScheduleTab'
 import Sidebar, { type TabId } from './components/Sidebar'
 
-const TEMP_UNLOCK_MS = 5 * 60 * 1000
-
 function App(): React.JSX.Element {
   const [dashboard, setDashboard] = useState<DashboardState | null>(null)
   const [config, setConfig] = useState<AppConfig | null>(null)
   const [activeTab, setActiveTab] = useState<TabId>('dashboard')
   const [isUnlockModalOpen, setIsUnlockModalOpen] = useState(false)
-  const [tempUnlockedUntil, setTempUnlockedUntil] = useState<number | null>(null)
   const [now, setNow] = useState(() => Date.now())
 
   const refreshDashboard = (): void => {
@@ -27,13 +24,16 @@ function App(): React.JSX.Element {
     return window.api.onTickUpdate(setDashboard)
   }, [])
 
+  const tempUnlockedUntil = dashboard?.tempUnlockedUntil ?? null
+
   useEffect(() => {
     if (tempUnlockedUntil === null) return
 
     const timer = setInterval(() => {
       const current = Date.now()
       setNow(current)
-      if (current >= tempUnlockedUntil) setTempUnlockedUntil(null)
+      // Không chờ lượt 5 giây tiếp theo: khóa lại ngay khi hết giờ.
+      if (current > tempUnlockedUntil) refreshDashboard()
     }, 1000)
     return () => clearInterval(timer)
   }, [tempUnlockedUntil])
@@ -47,15 +47,16 @@ function App(): React.JSX.Element {
   }
 
   const tempUnlockMsLeft = tempUnlockedUntil === null ? 0 : Math.max(tempUnlockedUntil - now, 0)
-  const isRestricted =
-    dashboard.isFocusActive || dashboard.remainingSeconds <= 0 || dashboard.runningGames.length > 0
-  const isLocked = isRestricted && tempUnlockMsLeft === 0
+  const { isLocked } = dashboard
 
-  const startTempUnlock = (): void => {
-    const current = Date.now()
-    setNow(current)
-    setTempUnlockedUntil(current + TEMP_UNLOCK_MS)
-    setIsUnlockModalOpen(false)
+  const startTempUnlock = async (input: string): Promise<boolean> => {
+    const state = await window.api.verifyEmergencyUnlock(input)
+    setDashboard(state)
+    setNow(Date.now())
+
+    const isUnlocked = state.tempUnlockedUntil !== null
+    if (isUnlocked) setIsUnlockModalOpen(false)
+    return isUnlocked
   }
 
   return (

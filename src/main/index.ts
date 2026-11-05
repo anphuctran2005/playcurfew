@@ -3,9 +3,26 @@ import { join } from 'path'
 import { electronApp, optimizer, is } from '@electron-toolkit/utils'
 import icon from '../../resources/icon.png?asset'
 import { registerIpcHandlers } from './ipcHandlers'
-import { startMonitor } from './processMonitor'
+import { notify, startMonitor } from './processMonitor'
+import { getConfig } from './store'
+import { createTray, showMainWindow, updateTrayMenu } from './tray'
+
+const HIDDEN_FLAG = '--hidden'
 
 let mainWindow: BrowserWindow | null = null
+let isQuitting = false
+let hasShownTrayNotice = false
+
+function applyAutoStartConfig(enabled: boolean): void {
+  // Khi chưa đóng gói, exe là electron.exe: đăng ký sẽ trỏ sai ứng dụng.
+  if (!app.isPackaged) return
+
+  app.setLoginItemSettings({
+    openAtLogin: enabled,
+    path: app.getPath('exe'),
+    args: [HIDDEN_FLAG]
+  })
+}
 
 function createWindow(): void {
   // Create the browser window.
@@ -32,8 +49,25 @@ function createWindow(): void {
     mainWindow = null
   })
 
+  window.on('close', (event) => {
+    if (isQuitting) return
+
+    event.preventDefault()
+    window.hide()
+
+    if (!hasShownTrayNotice) {
+      hasShownTrayNotice = true
+      notify('PlayCurfew', 'PlayCurfew vẫn đang chạy ngầm dưới khay hệ thống.')
+    }
+  })
+
+  // Windows đang tắt máy hoặc đăng xuất: chặn đóng ở đây sẽ làm app cản việc tắt máy.
+  window.on('session-end', () => {
+    isQuitting = true
+  })
+
   window.on('ready-to-show', () => {
-    window.show()
+    if (!process.argv.includes(HIDDEN_FLAG)) window.show()
   })
 
   window.webContents.setWindowOpenHandler((details) => {
@@ -50,10 +84,20 @@ function createWindow(): void {
   }
 }
 
-// This method will be called when Electron has finished
-// initialization and is ready to create browser windows.
-// Some APIs can only be used after this event occurs.
-app.whenReady().then(() => {
+function startApp(): void {
+  app.on('second-instance', showMainWindow)
+
+  app.on('before-quit', () => {
+    isQuitting = true
+  })
+
+  // This method will be called when Electron has finished
+  // initialization and is ready to create browser windows.
+  // Some APIs can only be used after this event occurs.
+  void app.whenReady().then(onReady)
+}
+
+function onReady(): void {
   // Set app user model id for windows
   electronApp.setAppUserModelId('com.playcurfew.app')
 
@@ -64,16 +108,21 @@ app.whenReady().then(() => {
     optimizer.watchWindowShortcuts(window)
   })
 
-  registerIpcHandlers()
+  registerIpcHandlers(applyAutoStartConfig)
   createWindow()
-  startMonitor(() => mainWindow)
+  createTray(() => mainWindow)
+  applyAutoStartConfig(getConfig().launchAtStartup)
+  startMonitor(() => mainWindow, updateTrayMenu)
 
   app.on('activate', function () {
     // On macOS it's common to re-create a window in the app when the
     // dock icon is clicked and there are no other windows open.
     if (BrowserWindow.getAllWindows().length === 0) createWindow()
   })
-})
+}
+
+if (app.requestSingleInstanceLock()) startApp()
+else app.quit()
 
 // Quit when all windows are closed, except on macOS. There, it's common
 // for applications and their menu bar to stay active until the user quits

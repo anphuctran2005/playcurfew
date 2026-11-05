@@ -3,7 +3,7 @@ import { LockOpen, X } from 'lucide-react'
 
 interface EmergencyUnlockModalProps {
   phrase: string
-  onConfirm: () => void
+  onConfirm: (input: string) => Promise<boolean>
   onClose: () => void
 }
 
@@ -27,6 +27,7 @@ function EmergencyUnlockModal({
 }: EmergencyUnlockModalProps): React.JSX.Element {
   const dialogRef = useRef<HTMLDialogElement>(null)
   const [input, setInput] = useState('')
+  const [error, setError] = useState('')
 
   useEffect(() => {
     const dialog = dialogRef.current
@@ -39,6 +40,11 @@ function EmergencyUnlockModal({
   const extraChars = typedChars.slice(expectedChars.length).join('')
   const isMatch = typedChars.join('') === expectedChars.join('')
   const correctCount = expectedChars.filter((char, index) => char === typedChars[index]).length
+
+  const confirm = async (): Promise<void> => {
+    const isUnlocked = await onConfirm(input)
+    if (!isUnlocked) setError('Câu cam kết không khớp, hãy thử lại.')
+  }
 
   return (
     <dialog
@@ -86,6 +92,8 @@ function EmergencyUnlockModal({
         className="field mt-4 w-full resize-none"
       />
 
+      {error && <p className="mt-2 text-sm text-red-400">{error}</p>}
+
       <div className="mt-4 flex items-center justify-between gap-4">
         <p className="text-sm text-slate-400 tabular-nums">
           Đúng {correctCount}/{expectedChars.length} ký tự
@@ -94,7 +102,7 @@ function EmergencyUnlockModal({
           <button type="button" onClick={onClose} className="btn btn-secondary">
             Hủy
           </button>
-          <button type="button" disabled={!isMatch} onClick={onConfirm} className="btn btn-danger">
+          <button type="button" disabled={!isMatch} onClick={confirm} className="btn btn-danger">
             <LockOpen className="size-4" />
             Xác nhận Mở khóa (5 phút)
           </button>

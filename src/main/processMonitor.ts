@@ -15,6 +15,7 @@ import {
 
 const TICK_INTERVAL_MS = 5000
 const TICK_SECONDS = TICK_INTERVAL_MS / 1000
+const TEMP_UNLOCK_MS = 5 * 60 * 1000
 const NOTIFICATION_THROTTLE_MS = 15_000
 const MAX_OUTPUT_BYTES = 16 * 1024 * 1024
 
@@ -33,6 +34,7 @@ let lastViolationNoticeAt = 0
 let warnedDate = ''
 const warnedMarks = new Set<number>() // Số giây còn lại của các mốc đã cảnh báo hôm nay
 let isTicking = false
+let tempUnlockedUntil: number | null = null // Chỉ ở bộ nhớ: khởi động lại app là khóa lại
 
 async function listTasks(): Promise<Omit<RunningProcess, 'windowTitle'>[]> {
   try {
@@ -115,6 +117,20 @@ export function isCurrentlyInFocusSchedule(
   })
 }
 
+function isTempUnlockActive(): boolean {
+  return tempUnlockedUntil !== null && Date.now() <= tempUnlockedUntil
+}
+
+export function isSystemLocked(): boolean {
+  const remainingSeconds = getLimitSeconds() - getTodayUsage().usedSeconds
+  const isRestricted =
+    isCurrentlyInFocusSchedule(getFocusSchedules()) ||
+    remainingSeconds <= 0 ||
+    runningGames.length > 0
+
+  return isRestricted && !isTempUnlockActive()
+}
+
 export function getDashboardState(): DashboardState {
   const { date, usedSeconds, sessions } = getTodayUsage()
   const limitSeconds = getLimitSeconds()
@@ -126,11 +142,21 @@ export function getDashboardState(): DashboardState {
     remainingSeconds: Math.max(limitSeconds - usedSeconds, 0),
     isFocusActive: isCurrentlyInFocusSchedule(getFocusSchedules()),
     runningGames,
-    sessions
+    sessions,
+    isLocked: isSystemLocked(),
+    tempUnlockedUntil: isTempUnlockActive() ? tempUnlockedUntil : null
   }
 }
 
-function notify(title: string, body: string): void {
+export function verifyEmergencyUnlock(input: string): DashboardState {
+  // NFC vì một số bộ gõ tiếng Việt sinh dấu rời, trông giống hệt nhưng khác mã ký tự.
+  if (input.normalize('NFC') === getConfig().commitmentPhrase.normalize('NFC')) {
+    tempUnlockedUntil = Date.now() + TEMP_UNLOCK_MS
+  }
+  return getDashboardState()
+}
+
+export function notify(title: string, body: string): void {
   if (Notification.isSupported()) new Notification({ title, body }).show()
 }
 
@@ -165,7 +191,7 @@ function checkWarnings(remainingSeconds: number): void {
   notify('Sắp hết giờ chơi', `Còn khoảng ${Math.ceil(remainingSeconds / 60)} phút chơi hôm nay.`)
 }
 
-async function tick(getWindow: () => BrowserWindow | null): Promise<void> {
+async function tick(getWindow: () => BrowserWindow | null, onTick: () => void): Promise<void> {
   // tasklist có thể chậm hơn 5 giây khi máy bận, không để hai lượt chạy chồng lên nhau.
   if (isTicking) return
   isTicking = true
@@ -193,6 +219,7 @@ async function tick(getWindow: () => BrowserWindow | null): Promise<void> {
     if (window && !window.isDestroyed()) {
       window.webContents.send('on-tick-update', getDashboardState())
     }
+    onTick()
   } catch (error) {
     console.error('Lượt kiểm tra thất bại:', error)
   } finally {
@@ -200,6 +227,6 @@ async function tick(getWindow: () => BrowserWindow | null): Promise<void> {
   }
 }
 
-export function startMonitor(getWindow: () => BrowserWindow | null): void {
-  setInterval(() => void tick(getWindow), TICK_INTERVAL_MS)
+export function startMonitor(getWindow: () => BrowserWindow | null, onTick: () => void): void {
+  setInterval(() => void tick(getWindow, onTick), TICK_INTERVAL_MS)
 }

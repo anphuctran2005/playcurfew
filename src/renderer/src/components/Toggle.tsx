@@ -4,12 +4,19 @@ interface ToggleProps {
   checked: boolean
   label: string
   isLocked: boolean
+  lockBothWays?: boolean
   onChange: (checked: boolean) => void
 }
 
-/** `isLocked` chỉ chặn chiều tắt: bật lên luôn được phép. */
-function Toggle({ checked, label, isLocked, onChange }: ToggleProps): React.JSX.Element {
-  const isDisabled = isLocked && checked
+/** `isLocked` chỉ chặn chiều tắt, trừ khi có `lockBothWays`. */
+function Toggle({
+  checked,
+  label,
+  isLocked,
+  lockBothWays = false,
+  onChange
+}: ToggleProps): React.JSX.Element {
+  const isDisabled = isLocked && (checked || lockBothWays)
 
   return (
     <span className="flex items-center gap-2">
@@ -19,7 +26,7 @@ function Toggle({ checked, label, isLocked, onChange }: ToggleProps): React.JSX.
         role="switch"
         aria-checked={checked}
         aria-label={label}
-        title={isDisabled ? 'Đang khóa: dùng "Mở khóa khẩn cấp" để tắt' : undefined}
+        title={isDisabled ? 'Đang khóa: dùng "Mở khóa khẩn cấp" để thay đổi' : undefined}
         disabled={isDisabled}
         onClick={() => onChange(!checked)}
         className={`relative h-6 w-11 shrink-0 rounded-full transition-colors disabled:opacity-50 ${

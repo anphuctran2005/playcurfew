@@ -1,6 +1,6 @@
 import { ipcMain } from 'electron'
 import type { AppConfig, NewFocusSchedule, NewGame } from '../shared/types'
-import { getDashboardState, getRunningProcesses } from './processMonitor'
+import { getDashboardState, getRunningProcesses, verifyEmergencyUnlock } from './processMonitor'
 import {
   addFocusSchedule,
   addGame,
@@ -14,14 +14,19 @@ import {
   updateFocusSchedule,
   updateGame
 } from './store'
+import { updateTrayMenu } from './tray'
 
-export function registerIpcHandlers(): void {
+export function registerIpcHandlers(applyAutoStart: (enabled: boolean) => void): void {
   ipcMain.handle('get-dashboard-state', () => getDashboardState())
   ipcMain.handle('get-today-usage', () => getTodayUsage())
   ipcMain.handle('get-running-processes', () => getRunningProcesses())
 
   ipcMain.handle('get-config', () => getConfig())
-  ipcMain.handle('update-config', (_, patch: Partial<AppConfig>) => updateConfig(patch))
+  ipcMain.handle('update-config', (_, patch: Partial<AppConfig>) => {
+    const config = updateConfig(patch)
+    if (patch.launchAtStartup !== undefined) applyAutoStart(config.launchAtStartup)
+    return config
+  })
 
   ipcMain.handle('get-games', () => getGames())
   ipcMain.handle('add-game', (_, game: NewGame) => addGame(game))
@@ -36,4 +41,10 @@ export function registerIpcHandlers(): void {
     updateFocusSchedule(id, patch)
   )
   ipcMain.handle('remove-focus-schedule', (_, id: string) => removeFocusSchedule(id))
+
+  ipcMain.handle('verify-emergency-unlock', (_, input: string) => {
+    const state = verifyEmergencyUnlock(input)
+    updateTrayMenu()
+    return state
+  })
 }

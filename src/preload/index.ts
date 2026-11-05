@@ -20,6 +20,8 @@ const api: WindowApi = {
   updateFocusSchedule: (id, patch) => ipcRenderer.invoke('update-focus-schedule', id, patch),
   removeFocusSchedule: (id) => ipcRenderer.invoke('remove-focus-schedule', id),
 
+  verifyEmergencyUnlock: (input) => ipcRenderer.invoke('verify-emergency-unlock', input),
+
   onTickUpdate: (callback) => {
     const listener = (_: IpcRendererEvent, state: DashboardState): void => callback(state)
     ipcRenderer.on('on-tick-update', listener)

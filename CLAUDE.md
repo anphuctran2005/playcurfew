@@ -73,6 +73,14 @@ Output nằm ở `out/main`, `out/preload`, `out/renderer`. Alias `@renderer/*` 
 | `store.ts` | Đọc ghi dữ liệu qua `electron-store`, dữ liệu mặc định, reset usage theo ngày |
 | `processMonitor.ts` | Quét tiến trình, tắt game, vòng lặp 5 giây, thông báo, gửi `on-tick-update` |
 | `ipcHandlers.ts` | Đăng ký toàn bộ kênh `ipcMain.handle` |
+| `tray.ts` | Icon khay hệ thống, menu chuột phải cập nhật mỗi 5 giây |
+| `index.ts` | Single instance, thu xuống khay khi đóng, auto-start, cờ `--hidden` |
+
+`tray.ts` import `processMonitor.ts`, nên chiều ngược lại đi qua callback của `startMonitor` để tránh vòng import.
+
+`close` luôn bị chặn trừ khi `isQuitting`. `session-end` phải bật cờ này, nếu không Windows sẽ báo app cản việc tắt máy.
+
+Auto-start chỉ ghi Registry khi `app.isPackaged`, nên bật ở `npm run dev` chỉ lưu `config.launchAtStartup`.
 
 Logic đếm giờ chỉ nằm ở main, không đặt trong React. Vòng lặp chỉ gọi `tasklist`; `getRunningProcesses()` khởi động PowerShell nên chỉ dùng khi UI cần, không gọi theo chu kỳ.
 
@@ -88,7 +96,7 @@ Logic đếm giờ chỉ nằm ở main, không đặt trong React. Vòng lặp 
 | `components/ScheduleTab.tsx` | Giới hạn phút, khung giờ Focus |
 | `components/EmergencyUnlockModal.tsx` | Gõ lại câu cam kết để mở khóa 5 phút |
 
-`isLocked` chỉ nằm ở renderer: IPC trong main không kiểm tra khóa. `tempUnlockedUntil` không lưu xuống đĩa, tải lại trang sẽ về trạng thái khóa.
+`isSystemLocked()` ở `processMonitor.ts` là nguồn trạng thái khóa duy nhất, renderer nhận qua `DashboardState`. IPC ghi cấu hình chưa kiểm tra khóa, chỉ UI và nút Thoát trong Tray chặn. `tempUnlockedUntil` chỉ nằm trong bộ nhớ main: tải lại trang vẫn còn, khởi động lại app là khóa lại.
 
 #### Logo và ảnh tài liệu
 

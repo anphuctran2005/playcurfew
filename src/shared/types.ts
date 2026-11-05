@@ -49,6 +49,8 @@ export interface DashboardState {
   isFocusActive: boolean
   runningGames: GameItem[]
   sessions: SessionLog[]
+  isLocked: boolean // Nguồn trạng thái khóa duy nhất, tính ở main
+  tempUnlockedUntil: number | null // Timestamp hết mở khóa tạm thời, null nếu không mở khóa
 }
 
 export type NewGame = Omit<GameItem, 'id'>
@@ -72,6 +74,9 @@ export interface WindowApi {
   addFocusSchedule: (schedule: NewFocusSchedule) => Promise<FocusSchedule>
   updateFocusSchedule: (id: string, patch: Partial<NewFocusSchedule>) => Promise<FocusSchedule>
   removeFocusSchedule: (id: string) => Promise<void>
+
+  /** Đúng câu cam kết thì trạng thái trả về có `tempUnlockedUntil` khác null. */
+  verifyEmergencyUnlock: (input: string) => Promise<DashboardState>
 
   /** Trả về hàm hủy đăng ký. */
   onTickUpdate: (callback: (state: DashboardState) => void) => () => void
