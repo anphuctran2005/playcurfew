@@ -1,4 +1,4 @@
-appId: com.playcurfew.app
+appId: com.anphuc.playcurfew
 productName: PlayCurfew
 directories:
   buildResources: build
@@ -16,11 +16,18 @@ asarUnpack:
   - resources/**
 win:
   executableName: PlayCurfew
+  target:
+    - nsis
+  # taskkill cần Admin để tắt game có Anti-Cheat, schtasks cần để tạo task /RL HIGHEST.
+  requestedExecutionLevel: requireAdministrator
 nsis:
+  oneClick: false
+  allowToChangeInstallationDirectory: true
+  runAfterFinish: true
   artifactName: PlayCurfew-Setup.${ext}
   shortcutName: ${productName}
   uninstallDisplayName: ${productName}
-  createDesktopShortcut: always
+  createDesktopShortcut: true
 mac:
   entitlementsInherit: build/entitlements.mac.plist
   extendInfo:

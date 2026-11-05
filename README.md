@@ -30,6 +30,7 @@
 ## Yêu cầu
 
 - Windows 10 hoặc Windows 11 (64-bit)
+- Tài khoản có quyền Administrator
 - Node.js 20.19+ hoặc 22.12+ (đã kiểm thử với Node 24) và npm, chỉ cần khi cài từ mã nguồn
 
 ## Cài đặt
@@ -37,7 +38,9 @@
 ### Dùng bộ cài
 
 1. Bấm nút **Tải về cho Windows** ở đầu trang.
-2. Chạy file `PlayCurfew-Setup.exe` vừa tải. Ứng dụng tự cài và mở lên, đồng thời tạo lối tắt trên Desktop.
+2. Chạy file `PlayCurfew-Setup.exe` vừa tải, chọn thư mục cài đặt rồi bấm **Install**. Bộ cài tạo lối tắt trên Desktop và mở ứng dụng khi xong.
+
+PlayCurfew cần quyền Administrator để tắt được game có Anti-Cheat, nên Windows sẽ hỏi xác nhận (UAC) mỗi lần bạn tự mở ứng dụng. Khi bật **Khởi động cùng Windows**, ứng dụng tự chạy lúc đăng nhập mà không hỏi lại.
 
 Bộ cài chưa được ký số nên Windows có thể hiện cảnh báo SmartScreen. Bấm **More info** rồi **Run anyway** để tiếp tục.
 
@@ -115,7 +118,7 @@ Trong giờ Focus, thanh trạng thái và vòng tròn chuyển sang màu đỏ,
 
 Bấm nút đóng cửa sổ chỉ thu ứng dụng xuống khay hệ thống, cạnh đồng hồ. Bấm vào biểu tượng để mở lại, bấm chuột phải để xem số phút còn lại hoặc thoát ứng dụng.
 
-Bật **Khởi động cùng Windows** ở đầu tab **Giới hạn & Focus** để ứng dụng tự chạy ngầm mỗi khi bật máy.
+Bật **Khởi động cùng Windows** ở đầu tab **Giới hạn & Focus** để ứng dụng tự chạy ngầm mỗi khi đăng nhập. Tùy chọn này tạo tác vụ `PlayCurfewAutoStart` trong Task Scheduler.
 
 ### Cơ chế khóa
 
@@ -154,7 +157,7 @@ Toàn bộ dữ liệu lưu trên máy tại `%APPDATA%\playcurfew\config.json`,
 
 - **Vẫn có thể tắt bằng Task Manager.** Khóa nút Thoát chỉ chặn thoát từ ứng dụng. Tắt tiến trình bằng Task Manager thì việc theo dõi sẽ dừng.
 - **Sửa cấu hình không bị chặn.** Sửa trực tiếp `config.json` vẫn thay đổi được cài đặt. PlayCurfew là công cụ hỗ trợ kỷ luật, không phải biện pháp chống phá.
-- **Game chạy quyền Administrator** có thể không tắt được nếu PlayCurfew chạy với quyền thường.
+- **Gỡ cài đặt:** tác vụ `PlayCurfewAutoStart` không tự bị xóa. Hãy tắt **Khởi động cùng Windows** trước khi gỡ.
 
 ## Dành cho nhà phát triển
 

@@ -16,16 +16,16 @@ import {
 } from './store'
 import { updateTrayMenu } from './tray'
 
-export function registerIpcHandlers(applyAutoStart: (enabled: boolean) => void): void {
+export function registerIpcHandlers(applyAutoStart: (enabled: boolean) => Promise<void>): void {
   ipcMain.handle('get-dashboard-state', () => getDashboardState())
   ipcMain.handle('get-today-usage', () => getTodayUsage())
   ipcMain.handle('get-running-processes', () => getRunningProcesses())
 
   ipcMain.handle('get-config', () => getConfig())
-  ipcMain.handle('update-config', (_, patch: Partial<AppConfig>) => {
-    const config = updateConfig(patch)
-    if (patch.launchAtStartup !== undefined) applyAutoStart(config.launchAtStartup)
-    return config
+  ipcMain.handle('update-config', async (_, patch: Partial<AppConfig>) => {
+    // Áp dụng trước khi lưu: lỗi thì công tắc giữ nguyên, không báo bật khi chưa có task.
+    if (patch.launchAtStartup !== undefined) await applyAutoStart(patch.launchAtStartup)
+    return updateConfig(patch)
   })
 
   ipcMain.handle('get-games', () => getGames())

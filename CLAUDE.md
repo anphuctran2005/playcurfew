@@ -74,13 +74,16 @@ Output nằm ở `out/main`, `out/preload`, `out/renderer`. Alias `@renderer/*` 
 | `processMonitor.ts` | Quét tiến trình, tắt game, vòng lặp 5 giây, thông báo, gửi `on-tick-update` |
 | `ipcHandlers.ts` | Đăng ký toàn bộ kênh `ipcMain.handle` |
 | `tray.ts` | Icon khay hệ thống, menu chuột phải cập nhật mỗi 5 giây |
+| `autoStartAdmin.ts` | Tạo, xóa task `PlayCurfewAutoStart` trong Task Scheduler |
 | `index.ts` | Single instance, thu xuống khay khi đóng, auto-start, cờ `--hidden` |
 
 `tray.ts` import `processMonitor.ts`, nên chiều ngược lại đi qua callback của `startMonitor` để tránh vòng import.
 
 `close` luôn bị chặn trừ khi `isQuitting`. `session-end` phải bật cờ này, nếu không Windows sẽ báo app cản việc tắt máy.
 
-Auto-start chỉ ghi Registry khi `app.isPackaged`, nên bật ở `npm run dev` chỉ lưu `config.launchAtStartup`.
+Auto-start chỉ tạo task khi `app.isPackaged`, nên bật ở `npm run dev` chỉ lưu `config.launchAtStartup`. Không dùng `setLoginItemSettings`: Windows bỏ qua mục khởi động của exe `requireAdministrator`. Task tạo từ XML vì `schtasks /Create` mặc định không chạy khi dùng pin.
+
+Bản đóng gói có manifest `requireAdministrator`, nên chạy từ phiên không Admin sẽ lỗi 740 hoặc hỏi UAC. Muốn test tự động thì build bản riêng: `npx electron-builder --dir -c.win.requestedExecutionLevel=asInvoker`.
 
 Logic đếm giờ chỉ nằm ở main, không đặt trong React. Vòng lặp chỉ gọi `tasklist`; `getRunningProcesses()` khởi động PowerShell nên chỉ dùng khi UI cần, không gọi theo chu kỳ.
 
@@ -124,6 +127,7 @@ Template còn phơi `window.electron` (gồm `ipcRenderer` thô) cho renderer. C
 #### Gọi lệnh Windows
 
 - Dùng `execFile` với mảng tham số, không ghép chuỗi qua shell, và bọc `try/catch`.
+- `schtasks` cũng dùng `execFile`: đường dẫn exe có dấu cách, ghép chuỗi qua shell dễ sai dấu ngoặc kép.
 - `exeName` phải qua `isValidExeName()`: `taskkill /F /IM "*"` sẽ tắt mọi tiến trình.
 - `taskkill /IM` tắt mọi tiến trình cùng tên. Khi test, dùng bản copy của một file exe với tên riêng, không dùng app có thể đang mở dữ liệu chưa lưu.
 

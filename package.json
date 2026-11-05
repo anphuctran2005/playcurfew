@@ -1,6 +1,6 @@
 {
   "name": "playcurfew",
-  "version": "1.0.3",
+  "version": "1.1.0",
   "description": "Ứng dụng Windows kiểm soát giờ chơi game và khóa game trong giờ học",
   "main": "./out/main/index.js",
   "author": "TranAnPhuc",

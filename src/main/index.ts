@@ -2,26 +2,18 @@ import { app, shell, BrowserWindow } from 'electron'
 import { join } from 'path'
 import { electronApp, optimizer, is } from '@electron-toolkit/utils'
 import icon from '../../resources/icon.png?asset'
+import { disableAdminAutoStart, enableAdminAutoStart, HIDDEN_FLAG } from './autoStartAdmin'
 import { registerIpcHandlers } from './ipcHandlers'
 import { notify, startMonitor } from './processMonitor'
 import { getConfig } from './store'
 import { createTray, showMainWindow, updateTrayMenu } from './tray'
 
-const HIDDEN_FLAG = '--hidden'
-
 let mainWindow: BrowserWindow | null = null
 let isQuitting = false
 let hasShownTrayNotice = false
 
-function applyAutoStartConfig(enabled: boolean): void {
-  // Khi chưa đóng gói, exe là electron.exe: đăng ký sẽ trỏ sai ứng dụng.
-  if (!app.isPackaged) return
-
-  app.setLoginItemSettings({
-    openAtLogin: enabled,
-    path: app.getPath('exe'),
-    args: [HIDDEN_FLAG]
-  })
+function applyAutoStartConfig(enabled: boolean): Promise<void> {
+  return enabled ? enableAdminAutoStart() : disableAdminAutoStart()
 }
 
 function createWindow(): void {
@@ -99,7 +91,7 @@ function startApp(): void {
 
 function onReady(): void {
   // Set app user model id for windows
-  electronApp.setAppUserModelId('com.playcurfew.app')
+  electronApp.setAppUserModelId('com.anphuc.playcurfew')
 
   // Default open or close DevTools by F12 in development
   // and ignore CommandOrControl + R in production.
@@ -111,7 +103,7 @@ function onReady(): void {
   registerIpcHandlers(applyAutoStartConfig)
   createWindow()
   createTray(() => mainWindow)
-  applyAutoStartConfig(getConfig().launchAtStartup)
+  if (getConfig().launchAtStartup) void enableAdminAutoStart().catch(console.error)
   startMonitor(() => mainWindow, updateTrayMenu)
 
   app.on('activate', function () {
