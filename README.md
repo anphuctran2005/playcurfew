@@ -26,7 +26,7 @@
 - **Focus schedules:** listed games are closed if opened during study hours, including schedules that run past midnight.
 - **Visual app picker:** add games by clicking them, with real icons. No need to type `.exe` names.
 - **Automatic tracking:** scans Windows processes every 5 seconds, counts play time, and closes games that break the rules.
-- **Warnings:** notifies you when 5 minutes and 1 minute of play time remain.
+- **In-game warnings:** at 5 minutes, 1 minute, and 15 seconds left, a click-through banner with sound appears over your game without taking focus. It works in windowed and borderless modes. Use the test button in **Limits & Focus** to check the volume.
 - **Settings lock:** while you are playing, during Focus hours, or after your time runs out, actions that loosen the rules are disabled.
 - **Emergency unlock:** you must retype a commitment sentence by hand, with no pasting, to unlock for 5 minutes.
 - **History:** see today's play sessions with start times and durations.

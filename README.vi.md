@@ -26,7 +26,7 @@
 - **Khung giờ Focus:** game trong danh sách sẽ bị tắt nếu mở trong giờ học, kể cả khung giờ vắt qua nửa đêm.
 - **Chọn ứng dụng trực quan:** thêm game bằng cách bấm chọn, có icon thật, không cần gõ tên `.exe`.
 - **Theo dõi tự động:** cứ 5 giây quét tiến trình Windows một lần, cộng giờ chơi và tắt game khi vi phạm.
-- **Cảnh báo:** thông báo khi còn 5 phút và 1 phút chơi.
+- **Cảnh báo trong game:** khi còn 5 phút, 1 phút và 15 giây, một thanh cảnh báo kèm âm thanh hiện đè lên game, không chiếm focus và cho chuột bấm xuyên qua. Hoạt động ở chế độ cửa sổ và borderless. Dùng nút test trong **Giới hạn & Focus** để thử âm lượng.
 - **Khóa cài đặt:** khi đang chơi, đang trong giờ Focus hoặc đã hết giờ, các thao tác nới lỏng quy tắc bị vô hiệu hóa.
 - **Mở khóa khẩn cấp:** phải tự gõ lại một câu cam kết, không dán được, để mở khóa trong 5 phút.
 - **Lịch sử:** xem các phiên chơi trong ngày với giờ bắt đầu và thời lượng.

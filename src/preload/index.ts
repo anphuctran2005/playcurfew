@@ -26,6 +26,7 @@ const api: WindowApi = {
   removeBackgroundImage: () => ipcRenderer.invoke('remove-background-image'),
 
   verifyEmergencyUnlock: (input) => ipcRenderer.invoke('verify-emergency-unlock', input),
+  testWarningOverlay: () => ipcRenderer.invoke('test-warning-overlay'),
 
   onTickUpdate: (callback) => {
     const listener = (_: IpcRendererEvent, state: DashboardState): void => callback(state)

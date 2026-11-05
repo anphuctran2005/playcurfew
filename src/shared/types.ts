@@ -95,6 +95,9 @@ export interface WindowApi {
   /** Đúng câu cam kết thì trạng thái trả về có `tempUnlockedUntil` khác null. */
   verifyEmergencyUnlock: (input: string) => Promise<DashboardState>
 
+  /** Hiện thử overlay cảnh báo kèm âm thanh. */
+  testWarningOverlay: () => Promise<void>
+
   /** Trả về hàm hủy đăng ký. */
   onTickUpdate: (callback: (state: DashboardState) => void) => () => void
 }

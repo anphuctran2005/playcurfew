@@ -164,6 +164,15 @@ function ScheduleTab({
     }
   }
 
+  const testOverlay = async (): Promise<void> => {
+    try {
+      await window.api.testWarningOverlay()
+      setError('')
+    } catch (e) {
+      setError(errorMessage(e))
+    }
+  }
+
   const run = async (action: () => Promise<unknown>): Promise<boolean> => {
     try {
       await action()
@@ -217,6 +226,16 @@ function ScheduleTab({
           lockBothWays
           onChange={setLaunchAtStartup}
         />
+      </section>
+
+      <section className="flex items-center justify-between gap-4 rounded-xl border border-slate-700 bg-slate-800 px-4 py-3">
+        <div>
+          <h3 className="text-sm font-semibold">{t('overlayTitle')}</h3>
+          <p className="text-xs text-slate-400">{t('overlayHint')}</p>
+        </div>
+        <button type="button" onClick={testOverlay} className="btn btn-secondary shrink-0">
+          {t('overlayTestButton')}
+        </button>
       </section>
 
       <Card

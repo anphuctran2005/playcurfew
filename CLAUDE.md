@@ -74,6 +74,7 @@ Output nằm ở `out/main`, `out/preload`, `out/renderer`. Alias `@renderer/*` 
 | `processMonitor.ts` | Quét tiến trình, tắt game, vòng lặp 5 giây, thông báo, gửi `on-tick-update` |
 | `ipcHandlers.ts` | Đăng ký toàn bộ kênh `ipcMain.handle` |
 | `appScanner.ts` | Quét ứng dụng đang mở kèm icon, chọn file `.exe` hoặc `.lnk` |
+| `overlayWindow.ts` | Cửa sổ cảnh báo đè lên game, HTML nhúng dạng `data:` URL kèm âm thanh |
 | `tray.ts` | Icon khay hệ thống, menu chuột phải cập nhật mỗi 5 giây |
 | `autoStartAdmin.ts` | Tạo, xóa task `PlayCurfewAutoStart` trong Task Scheduler |
 | `index.ts` | Single instance, thu xuống khay khi đóng, auto-start, cờ `--hidden` |
@@ -85,6 +86,8 @@ Output nằm ở `out/main`, `out/preload`, `out/renderer`. Alias `@renderer/*` 
 Auto-start chỉ tạo task khi `app.isPackaged`, nên bật ở `npm run dev` chỉ lưu `config.launchAtStartup`. Không dùng `setLoginItemSettings`: Windows bỏ qua mục khởi động của exe `requireAdministrator`. Task tạo từ XML vì `schtasks /Create` mặc định không chạy khi dùng pin.
 
 Bản đóng gói có manifest `requireAdministrator`, nên chạy từ phiên không Admin sẽ lỗi 740 hoặc hỏi UAC. Muốn test tự động thì build bản riêng: `npx electron-builder --dir -c.win.requestedExecutionLevel=asInvoker`.
+
+Overlay phải giữ `focusable: false` và `showInactive()`: game mất focus có thể thu nhỏ hoặc văng. Dùng `setAlwaysOnTop` nên chỉ đè được game borderless, không đè được exclusive fullscreen. Tên game đưa vào trang dạng JSON rồi gán `textContent`, không ghép vào HTML. Giọng đọc chỉ chạy khi Windows có giọng đúng ngôn ngữ.
 
 Logic đếm giờ chỉ nằm ở main, không đặt trong React. Vòng lặp chỉ gọi `tasklist`; `getRunningGuiApps()` khởi động PowerShell nên chỉ dùng khi mở bảng chọn, không gọi theo chu kỳ.
 

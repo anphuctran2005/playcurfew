@@ -2,6 +2,7 @@ import { BrowserWindow, ipcMain } from 'electron'
 import type { AppConfig, NewFocusSchedule, NewGame } from '../shared/types'
 import { browseExecutableOrShortcut, getRunningGuiApps } from './appScanner'
 import { getBackgroundImage, pickBackgroundImage, removeBackgroundImage } from './background'
+import { showWarningOverlay } from './overlayWindow'
 import { getDashboardState, verifyEmergencyUnlock } from './processMonitor'
 import {
   addFocusSchedule,
@@ -12,6 +13,7 @@ import {
   getTodayUsage,
   removeFocusSchedule,
   removeGame,
+  translateMain,
   updateConfig,
   updateFocusSchedule,
   updateGame
@@ -60,4 +62,8 @@ export function registerIpcHandlers(applyAutoStart: (enabled: boolean) => Promis
     updateTrayMenu()
     return state
   })
+
+  ipcMain.handle('test-warning-overlay', () =>
+    showWarningOverlay(5, translateMain('overlayTestGame'))
+  )
 }

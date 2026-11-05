@@ -3,6 +3,7 @@ import { promisify } from 'util'
 import { BrowserWindow, Notification } from 'electron'
 import { getCommitmentPhrase } from '../shared/i18n'
 import type { DashboardState, FocusSchedule, GameItem } from '../shared/types'
+import { showFinalCountdownOverlay, showWarningOverlay } from './overlayWindow'
 import {
   addUsageSeconds,
   getConfig,
@@ -19,6 +20,7 @@ const TICK_INTERVAL_MS = 5000
 const TICK_SECONDS = TICK_INTERVAL_MS / 1000
 const TEMP_UNLOCK_MS = 5 * 60 * 1000
 const NOTIFICATION_THROTTLE_MS = 15_000
+const FINAL_COUNTDOWN_SECONDS = 15
 const MAX_OUTPUT_BYTES = 16 * 1024 * 1024
 
 // Không qua shell: exeName đến từ cấu hình người dùng, ghép vào chuỗi lệnh sẽ bị command injection.
@@ -146,7 +148,7 @@ async function enforceBlock(games: GameItem[], isFocus: boolean): Promise<void> 
     notify(translateMain('noticeOutOfTimeTitle'), translateMain('noticeOutOfTimeBody', { names }))
 }
 
-function checkWarnings(remainingSeconds: number): void {
+function checkWarnings(remainingSeconds: number, game: GameItem): void {
   const today = toDateKey()
   if (warnedDate !== today) {
     warnedDate = today
@@ -158,14 +160,24 @@ function checkWarnings(remainingSeconds: number): void {
   const crossed = getConfig()
     .warningMinutesLeft.map((minutes) => minutes * 60)
     .filter((mark) => remainingSeconds <= mark && !warnedMarks.has(mark))
-  if (crossed.length === 0) return
+  const minutesLeft = Math.ceil(remainingSeconds / 60)
 
   // Mở app khi đã vượt nhiều mốc thì chỉ báo một lần, nhưng vẫn đánh dấu đủ các mốc.
   crossed.forEach((mark) => warnedMarks.add(mark))
-  notify(
-    translateMain('noticeWarningTitle'),
-    translateMain('noticeWarningBody', { minutes: Math.ceil(remainingSeconds / 60) })
-  )
+  if (crossed.length > 0) {
+    notify(
+      translateMain('noticeWarningTitle'),
+      translateMain('noticeWarningBody', { minutes: minutesLeft })
+    )
+  }
+
+  // Dùng <= thay vì ===: mở game khi chỉ còn 10 giây vẫn phải được báo trước khi bị tắt.
+  if (remainingSeconds <= FINAL_COUNTDOWN_SECONDS && !warnedMarks.has(FINAL_COUNTDOWN_SECONDS)) {
+    warnedMarks.add(FINAL_COUNTDOWN_SECONDS)
+    showFinalCountdownOverlay(remainingSeconds, game.name)
+  } else if (crossed.length > 0) {
+    showWarningOverlay(minutesLeft, game.name)
+  }
 }
 
 async function tick(getWindow: () => BrowserWindow | null, onTick: () => void): Promise<void> {
@@ -188,7 +200,7 @@ async function tick(getWindow: () => BrowserWindow | null, onTick: () => void): 
       } else {
         // Hai game mở cùng lúc vẫn chỉ tính 5 giây thực, ghi vào phiên của game đầu tiên.
         const { usedSeconds } = addUsageSeconds(runningGames[0], TICK_SECONDS)
-        checkWarnings(limitSeconds - usedSeconds)
+        checkWarnings(limitSeconds - usedSeconds, runningGames[0])
       }
     }
 
